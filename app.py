@@ -643,7 +643,6 @@ def gerar_analise_robusta(dimensoes):
 def gerar_banco_sugestoes(dimensoes):
     sugestoes = []
     
-    # ------------------ BLOCO 1: EXIGÊNCIAS, CARGA E RITMO DE TRABALHO ------------------
     if dimensoes.get("Demandas", 5) < 3.8 or dimensoes.get("Exigências Laborais (Quantidade e Ritmo)", 5) < 3.8:
         sugestoes.append({
             "acao": "Avaliação Ergonômica e Cognitiva da Carga de Trabalho", 
@@ -671,7 +670,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Saúde Ocupacional", "resp": "SESMT / Liderança", "prazo": "Imediato"
         })
         
-    # ------------------ BLOCO 2: AUTONOMIA, CONTROLE E INFLUÊNCIA ------------------
     if dimensoes.get("Controle", 5) < 3.8 or dimensoes.get("Organização e Influência", 5) < 3.8:
         sugestoes.append({
             "acao": "Job Crafting (Redesenho do Trabalho)", 
@@ -694,7 +692,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Desenvolvimento", "resp": "T&D (Treinamento)", "prazo": "Plano Anual"
         })
         
-    # ------------------ BLOCO 3: SUPORTE, LIDERANÇA E RELAÇÕES SOCIAIS ------------------
     if dimensoes.get("Suporte do Gestor", 5) < 3.8 or dimensoes.get("Suporte dos Colegas", 5) < 3.8 or dimensoes.get("Relações Sociais e Liderança", 5) < 3.8:
         sugestoes.append({
             "acao": "Letramento em Liderança Empática e Sensível", 
@@ -722,7 +719,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Clima", "resp": "Comunicação Interna", "prazo": "Semestral"
         })
 
-    # ------------------ BLOCO 4: AMBIENTE, RESPEITO E GESTÃO DE CONFLITOS ------------------
     if dimensoes.get("Relacionamentos", 5) < 3.8 or dimensoes.get("Ambiente Ofensivo (Últimos 12 meses)", 5) < 3.8 or dimensoes.get("Transparência de Papel e Conflitos", 5) < 3.8:
         sugestoes.append({
             "acao": "Política de Tolerância Zero (Assédio e Discriminação)", 
@@ -740,7 +736,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Clima", "resp": "Pessin Gestão / RH", "prazo": "Sob Demanda"
         })
         
-    # ------------------ BLOCO 5: PROPÓSITO, VALORES, JUSTIÇA E SATISFAÇÃO ------------------
     if dimensoes.get("Papel na Empresa", 5) < 3.8 or dimensoes.get("Valores, Justiça e Confiança", 5) < 3.8 or dimensoes.get("Atitude e Satisfação", 5) < 3.8:
         sugestoes.append({
             "acao": "Alinhamento Claro de Funções (Job Description Vivo)", 
@@ -763,7 +758,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Confiança", "resp": "Diretoria", "prazo": "Semestral"
         })
         
-    # ------------------ BLOCO 6: GESTÃO E TRANSIÇÃO DE MUDANÇAS ------------------
     if dimensoes.get("Gestão de Mudança", 5) < 3.8:
         sugestoes.append({
             "acao": "Comunicação Antecipada e Transparente", 
@@ -776,7 +770,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Gestão de Mudança", "resp": "Líder de Projetos", "prazo": "Por Projeto"
         })
 
-    # ------------------ BLOCO 7: SAÚDE, BEM-ESTAR, SONO E FAMÍLIA (EXCLUSIVO COPSOQ) ------------------
     if dimensoes.get("Saúde, Bem-estar e Rotina", 5) < 3.8:
         sugestoes.append({
             "acao": "Programa Estruturado de Apoio Psicológico", 
@@ -794,7 +787,6 @@ def gerar_banco_sugestoes(dimensoes):
             "area": "Bem-estar (Work-life)", "resp": "RH Institucional", "prazo": "Revisão Anual"
         })
         
-    # ------------------ FALLBACK (CENÁRIO EXCELENTE) ------------------
     if not sugestoes:
         sugestoes.append({
             "acao": "Monitoramento Contínuo com Pesquisas de Pulso", 
@@ -942,10 +934,32 @@ def admin_dashboard():
         total_resp_view = len(responses_filtered)
         total_vidas_view = sum(c.get('func', 0) for c in companies_filtered)
         
-        # --- Lógica de Alerta de Risco (Empresas na Zona Vermelha) ---
-        # Considera em risco apenas empresas que já têm respostas (score > 0) e pontuação menor que 3.0
+        # --- CÁLCULO INTELIGENTE DOS ALERTAS DE RISCO, EXPIRAÇÃO E ADESÃO ---
         alertas_risco = sum(1 for c in companies_filtered if 0 < c.get('score', 0) < 3.0)
         
+        hoje = datetime.date.today()
+        empresas_expirando = []
+        empresas_baixa_adesao = []
+
+        for c in companies_filtered:
+            # Checa Vencimento do Link
+            if c.get('valid_until'):
+                try:
+                    data_limite = datetime.date.fromisoformat(c['valid_until'])
+                    dias_restantes = (data_limite - hoje).days
+                    # Consideramos "Aviso" se expirar nos próximos 7 dias
+                    if 0 <= dias_restantes <= 7:
+                        empresas_expirando.append((c['razao'], dias_restantes))
+                except: pass
+                
+            # Checa Adesão Mínima de 70%
+            func = c.get('func', 1)
+            resp = c.get('respondidas', 0)
+            adesao = (resp / func) * 100 if func > 0 else 0
+            if adesao > 0 and adesao < 70:
+                empresas_baixa_adesao.append((c['razao'], adesao))
+        
+        # --- RENDERIZAÇÃO DOS KPIS TOP ---
         col1, col2, col3, col4 = st.columns(4)
         if perm == "Analista":
             with col1: kpi_card("Total de Colaboradores", total_vidas_view, "👥", "bg-blue")
@@ -959,8 +973,25 @@ def admin_dashboard():
             else: 
                 with col3: kpi_card("Avaliações Disponíveis", credits_left, "💳", "bg-orange")
 
-        with col4: kpi_card("Alertas de Risco", alertas_risco, "🚨", "bg-red")
+        with col4: kpi_card("Score Global Crítico", alertas_risco, "🚨", "bg-red")
         
+        # --- BANNER DE ALERTAS E PENDÊNCIAS (Inteligência RH) ---
+        if alertas_risco > 0 or empresas_expirando or empresas_baixa_adesao:
+            st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+            st.markdown("##### ⚠️ Painel de Alertas e Pendências Operacionais")
+            
+            if empresas_expirando:
+                for emp, dias in empresas_expirando:
+                    st.warning(f"⏳ **Prazo Perto de Expirar:** A pesquisa da empresa **{emp}** encerra em **{dias} dias**. Lembre-se de verificar o volume e solicitar extensão se necessário.")
+            
+            if empresas_baixa_adesao:
+                st.info(f"📊 **Amostragem Insuficiente:** **{len(empresas_baixa_adesao)} empresa(s)** estão com coletas em andamento, mas ainda não atingiram a marca de segurança estatística (**70%** de adesão da população).")
+            
+            if alertas_risco > 0:
+                st.error(f"❤️‍🩹 **Risco de Saúde Ocupacional:** Identificamos **{alertas_risco} empresa(s)** que apresentam um Score Geral na Zona Crítica (Abaixo de 3.0 na média).")
+                
+            st.markdown("</div>", unsafe_allow_html=True)
+
         st.markdown("<br>", unsafe_allow_html=True)
         c1, c2 = st.columns([1, 1.5])
         
@@ -1019,18 +1050,23 @@ def admin_dashboard():
         c3, c4 = st.columns([1.5, 1])
         with c3:
              st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
-             st.markdown("##### Status das Avaliações (Adesão)")
+             st.markdown("##### Status Científico das Avaliações (Regra dos 70%)")
              if companies_filtered:
-                 status_dist = {"Pesquisa Concluída": 0, "Pesquisa em Andamento": 0}
+                 status_dist = {"Amostra Validada (≥ 70%)": 0, "Amostra Insuficiente (< 70%)": 0}
                  for c in companies_filtered:
-                     if c.get('respondidas',0) >= c.get('func',1): 
-                         status_dist["Pesquisa Concluída"] += 1
+                     func = c.get('func', 1)
+                     resp = c.get('respondidas', 0)
+                     adesao = (resp / func) * 100 if func > 0 else 0
+                     
+                     if adesao >= 70: 
+                         status_dist["Amostra Validada (≥ 70%)"] += 1
                      else: 
-                         status_dist["Pesquisa em Andamento"] += 1
+                         status_dist["Amostra Insuficiente (< 70%)"] += 1
                  
-                 fig_pie = px.pie(names=list(status_dist.keys()), values=list(status_dist.values()), hole=0.6, color_discrete_sequence=[COR_SECUNDARIA, COR_RISCO_MEDIO])
+                 fig_pie = px.pie(names=list(status_dist.keys()), values=list(status_dist.values()), hole=0.6, color_discrete_sequence=[COR_RISCO_BAIXO, COR_RISCO_MEDIO])
                  fig_pie.update_layout(height=250, margin=dict(t=0, b=0, l=0, r=0))
                  st.plotly_chart(fig_pie, use_container_width=True)
+                 st.caption("Gráfico mapeia quantas empresas já atingiram a taxa de segurança estatística para emissão do Laudo final.")
              else: 
                  st.info("Cadastre uma empresa para visualizar este gráfico.")
              st.markdown("</div>", unsafe_allow_html=True)
@@ -1122,9 +1158,19 @@ def admin_dashboard():
                     with st.expander(f"🏢 {emp['razao']}"):
                         c1, c2, c3, c4 = st.columns(4)
                         c1.write(f"**CNPJ:** {emp.get('cnpj','')}")
-                        c2.write(f"**Avaliações:** {emp.get('respondidas',0)} / {emp.get('limit_evals', '∞')}")
                         c3.info(f"**Metodologia:** {emp.get('metodologia', 'HSE-IT (35 itens)')}")
                         
+                        # Indicador de 70% na aba Clientes
+                        func_t = emp.get('func', 1)
+                        resp_t = emp.get('respondidas', 0)
+                        adesao_pct = (resp_t / func_t) * 100 if func_t > 0 else 0
+                        
+                        c2.write(f"**Adesão Atual:** {adesao_pct:.1f}%")
+                        if adesao_pct >= 70:
+                            c2.markdown(f"<span style='color:{COR_RISCO_BAIXO}; font-size:12px; font-weight:bold;'>✅ Amostra Válida</span>", unsafe_allow_html=True)
+                        else:
+                            c2.markdown(f"<span style='color:{COR_RISCO_MEDIO}; font-size:12px; font-weight:bold;'>⚠️ Abaixo dos 70%</span>", unsafe_allow_html=True)
+
                         c4_1, c4_2 = c4.columns(2)
                         if c4_1.button("✏️ Editar", key=f"ed_{emp['id']}"): 
                              st.session_state.edit_mode = True
@@ -1323,12 +1369,22 @@ def admin_dashboard():
                 
                 limit = empresa.get('limit_evals', 999999)
                 usadas = empresa.get('respondidas', 0)
+                func_t = empresa.get('func', 1)
+                
+                # Barra de Progresso visual para os 70%
+                adesao_pct = (usadas / func_t) * 100 if func_t > 0 else 0
+                st.progress(min(adesao_pct / 100.0, 1.0))
+                
+                if adesao_pct >= 70:
+                    st.success(f"✅ Amostra Estatística Validada! ({adesao_pct:.1f}% de adesão alcançada)")
+                else:
+                    faltam = max(0, int(func_t * 0.7) - usadas)
+                    st.warning(f"⚠️ Amostra Parcial: {adesao_pct:.1f}%. Faltam cerca de {faltam} respostas para atingir a margem de segurança de 70%.")
+
                 val = empresa.get('valid_until', '-')
                 try: val = datetime.date.fromisoformat(val).strftime('%d/%m/%Y')
                 except: pass
-                st.caption(f"📊 Avaliações Utilizadas: {usadas} de {limit} disponíveis.")
-                st.caption(f"📅 O Link será válido até: {val}")
-                st.caption(f"🧠 Metodologia escolhida para a pesquisa: **{empresa.get('metodologia', 'HSE-IT (35 itens)')}**")
+                st.caption(f"📅 O Link será válido até: {val} | 🧠 Matriz de Pesquisa: {empresa.get('metodologia', 'HSE-IT')}")
                 
                 if st.button("👁️ Visualizar Pesquisa (Como o colaborador verá)"):
                     st.session_state.current_company = empresa
@@ -1343,7 +1399,7 @@ def admin_dashboard():
             st.markdown("</div>", unsafe_allow_html=True)
             
             st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
-            st.markdown("##### 💬 Mensagem de Convite Pronta (WhatsApp / E-mail)")
+            st.markdown("##### 💬 Sugestão de Mensagem de Convite (WhatsApp / E-mail)")
             texto_convite = f"""Olá, equipe da {empresa['razao']}! 👋
 
 Cuidar dos nossos resultados é muito importante, mas nada disso faz sentido se não cuidarmos, em primeiro lugar, de quem faz tudo acontecer: vocês.
