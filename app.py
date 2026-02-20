@@ -99,9 +99,8 @@ st.markdown(f"""
     .rep-table th {{ background-color: {COR_PRIMARIA}; color: #ffffff; padding: 10px 8px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }}
     .rep-table td {{ border-bottom: 1px solid #eeeeee; padding: 10px 8px; vertical-align: top; }}
     
-    div[role="radiogroup"] > label {{ font-weight: 500; color: #444444; background: #f8f9fa; padding: 10px 16px; border-radius: 8px; border: 1px solid #eeeeee; cursor: pointer; transition: all 0.2s ease-in-out; white-space: normal; text-align: center; flex: 1 1 0px; display: flex; justify-content: center; align-items: center; }}
-    div[role="radiogroup"] > label:hover {{ background: #e2e6ea; border-color: {COR_SECUNDARIA}; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }}
-    div[data-testid="stRadio"] > div {{ flex-direction: row; flex-wrap: wrap; gap: 8px; width: 100%; padding-bottom: 15px; }}
+    /* Espaçamento elegante para os radio buttons nativos do Streamlit sem quebrar os quadrados */
+    div[role="radiogroup"] {{ gap: 15px; padding-top: 5px; padding-bottom: 15px; }}
 
     @media print {{
         [data-testid="stSidebar"], .stButton, header, footer, .no-print {{ display: none !important; }}
@@ -133,7 +132,7 @@ if 'companies_db' not in st.session_state: st.session_state.companies_db = []
 if 'local_responses_db' not in st.session_state: st.session_state.local_responses_db = []
 
 # ------------------------------------------------------------------------------
-# 3.1. BANCO DE METODOLOGIAS (HSE + COPSOQ)
+# 3.1. BANCO DE METODOLOGIAS (HSE + COPSOQ) - ADAPTADO PARA PT-BR
 # ------------------------------------------------------------------------------
 if 'methodologies' not in st.session_state:
     # Definição das escalas variadas
@@ -152,43 +151,43 @@ if 'methodologies' not in st.session_state:
                     {"id": "h2", "q": "Sou pressionado a trabalhar longas horas?", "rev": True, "options": escala_freq, "help": "Exemplo: Sentir que apenas o seu horário normal não é suficiente para a empresa."},
                     {"id": "h3", "q": "Tenho que trabalhar muito intensamente?", "rev": True, "options": escala_freq, "help": "Exemplo: Não ter tempo nem para fazer uma pequena pausa devido ao volume de demandas."},
                     {"id": "h4", "q": "Tenho que negligenciar algumas tarefas?", "rev": True, "options": escala_freq, "help": "Exemplo: Ter que fazer as coisas com menos qualidade para dar tempo de entregar tudo."},
-                    {"id": "h5", "q": "Não consigo fazer pausas suficientes?", "rev": True, "options": escala_freq, "help": "Exemplo: Precisar de encurtar a hora de almoço frequentemente."},
+                    {"id": "h5", "q": "Não consigo fazer pausas suficientes?", "rev": True, "options": escala_freq, "help": "Exemplo: Precisar encurtar a hora de almoço frequentemente."},
                     {"id": "h6", "q": "Sou pressionado por diferentes grupos?", "rev": True, "options": escala_freq, "help": "Exemplo: Receber ordens urgentes e contraditórias de pessoas diferentes."},
                     {"id": "h7", "q": "Tenho que trabalhar muito rápido?", "rev": True, "options": escala_freq, "help": "Exemplo: O ritmo exigido é sempre acelerado e desgastante."},
-                    {"id": "h8", "q": "Tenho prazos irrealistas?", "rev": True, "options": escala_freq, "help": "Exemplo: Metas que a equipa raramente consegue atingir de forma saudável."}
+                    {"id": "h8", "q": "Tenho prazos irrealistas?", "rev": True, "options": escala_freq, "help": "Exemplo: Metas que a equipe raramente consegue atingir de forma saudável."}
                 ],
-                "Controlo": [
-                    {"id": "h9", "q": "Posso decidir quando fazer uma pausa?", "rev": False, "options": escala_freq, "help": "Exemplo: Ter a liberdade de se levantar ou ir à casa de banho sem pedir autorização."},
+                "Controle": [
+                    {"id": "h9", "q": "Posso decidir quando fazer uma pausa?", "rev": False, "options": escala_freq, "help": "Exemplo: Ter a liberdade de se levantar ou ir ao banheiro sem pedir autorização."},
                     {"id": "h10", "q": "Tenho liberdade para decidir como faço o meu trabalho?", "rev": False, "options": escala_freq, "help": "Exemplo: Poder escolher o melhor método ou ferramenta para atingir os resultados."},
-                    {"id": "h11", "q": "Tenho poder de decisão sobre o meu ritmo?", "rev": False, "options": escala_freq, "help": "Exemplo: Poder gerir os seus picos de energia durante o dia."},
+                    {"id": "h11", "q": "Tenho poder de decisão sobre o meu ritmo?", "rev": False, "options": escala_freq, "help": "Exemplo: Poder gerenciar os seus picos de energia durante o dia."},
                     {"id": "h12", "q": "Eu decido quando vou realizar cada tarefa?", "rev": False, "options": escala_freq, "help": "Exemplo: Ter autonomia para organizar a sua própria agenda diária."},
-                    {"id": "h13", "q": "Tenho voz sobre como o meu trabalho é realizado?", "rev": False, "options": escala_freq, "help": "Exemplo: As suas ideias de melhoria são ouvidas e valorizadas pela gestão."},
+                    {"id": "h13", "q": "Tenho voz sobre como o meu trabalho é realizado?", "rev": False, "options": escala_freq, "help": "Exemplo: Suas ideias de melhoria são ouvidas e valorizadas pela gestão."},
                     {"id": "h14", "q": "O meu horário de trabalho pode ser flexível?", "rev": False, "options": escala_freq, "help": "Exemplo: Ter acesso a banco de horas ou acordos amigáveis com a liderança."}
                 ],
                 "Suporte do Gestor": [
-                    {"id": "h15", "q": "Recebo feedback sobre o trabalho?", "rev": False, "options": escala_freq, "help": "Exemplo: O seu gestor conversa consigo de forma clara e respeitosa sobre o seu desempenho."},
-                    {"id": "h16", "q": "Posso contar com o meu superior perante um problema?", "rev": False, "options": escala_freq, "help": "Exemplo: Saber que o gestor vai ajudar a resolver uma falha, em vez de apenas o culpar."},
+                    {"id": "h15", "q": "Recebo feedback sobre o trabalho?", "rev": False, "options": escala_freq, "help": "Exemplo: O seu gestor conversa com você de forma clara e respeitosa sobre o seu desempenho."},
+                    {"id": "h16", "q": "Posso contar com o meu superior diante de um problema?", "rev": False, "options": escala_freq, "help": "Exemplo: Saber que o gestor vai ajudar a resolver uma falha, em vez de apenas culpá-lo."},
                     {"id": "h17", "q": "Posso falar com o meu superior sobre algo que me chateou?", "rev": False, "options": escala_freq, "help": "Exemplo: Sentir que existe um espaço seguro para conversas sinceras."},
                     {"id": "h18", "q": "Sinto o apoio do meu gestor(a)?", "rev": False, "options": escala_freq, "help": "Exemplo: Sentir que a sua chefia se importa de forma genuína com o seu bem-estar."},
-                    {"id": "h19", "q": "O meu gestor motiva-me no trabalho?", "rev": False, "options": escala_freq, "help": "Exemplo: Receber elogios e reconhecimento quando faz um bom trabalho."}
+                    {"id": "h19", "q": "Meu gestor me motiva no trabalho?", "rev": False, "options": escala_freq, "help": "Exemplo: Receber elogios e reconhecimento quando faz um bom trabalho."}
                 ],
                 "Suporte dos Colegas": [
-                    {"id": "h20", "q": "Recebo a ajuda e o apoio de que preciso dos meus colegas?", "rev": False, "options": escala_freq, "help": "Exemplo: A equipa é unida e ajuda-se mutuamente nos momentos de maior pressão."},
+                    {"id": "h20", "q": "Recebo a ajuda e o apoio que preciso dos meus colegas?", "rev": False, "options": escala_freq, "help": "Exemplo: A equipe é unida e ajuda-se mutuamente nos momentos de maior pressão."},
                     {"id": "h21", "q": "Recebo o respeito que mereço dos meus colegas?", "rev": False, "options": escala_freq, "help": "Exemplo: O tratamento diário é cordial e livre de preconceitos."},
-                    {"id": "h22", "q": "Os meus colegas estão dispostos a ouvir os meus problemas?", "rev": False, "options": escala_freq, "help": "Exemplo: Ter com quem desabafar sobre um dia difícil ou um cliente complicado."},
-                    {"id": "h23", "q": "Os meus colegas ajudam-me em momentos difíceis?", "rev": False, "options": escala_freq, "help": "Exemplo: A equipa divide o esforço quando o volume de trabalho está demasiado alto."}
+                    {"id": "h22", "q": "Meus colegas estão dispostos a ouvir meus problemas?", "rev": False, "options": escala_freq, "help": "Exemplo: Ter com quem desabafar sobre um dia difícil ou um cliente complicado."},
+                    {"id": "h23", "q": "Meus colegas me ajudam em momentos difíceis?", "rev": False, "options": escala_freq, "help": "Exemplo: A equipe divide o esforço quando o volume de trabalho está muito alto."}
                 ],
                 "Relacionamentos": [
                     {"id": "h24", "q": "Estou sujeito a desrespeito pessoal?", "rev": True, "options": escala_freq, "help": "Exemplo: Ouvir comentários desrespeitosos, constrangedores ou pressões indevidas."},
                     {"id": "h25", "q": "Existem atritos ou conflitos entre colegas?", "rev": True, "options": escala_freq, "help": "Exemplo: O ambiente é marcado por fofocas, divisões ou discussões frequentes."},
                     {"id": "h26", "q": "Sinto-me isolado ou sofro bullying?", "rev": True, "options": escala_freq, "help": "Exemplo: Ser excluído de propósito de conversas de trabalho ou ser alvo de piadas de mau gosto."},
-                    {"id": "h27", "q": "Os relacionamentos no trabalho são tensos?", "rev": True, "options": escala_freq, "help": "Exemplo: Sentir que precisa de 'pisar em ovos' a falar com as pessoas por receio de reações exageradas."}
+                    {"id": "h27", "q": "Os relacionamentos no trabalho são tensos?", "rev": True, "options": escala_freq, "help": "Exemplo: Sentir que precisa 'pisar em ovos' ao falar com as pessoas por receio de reações exageradas."}
                 ],
                 "Papel na Empresa": [
                     {"id": "h28", "q": "Sei claramente o que é esperado de mim?", "rev": False, "options": escala_conc, "help": "Exemplo: As suas metas e tarefas diárias estão bem definidas e acordadas."},
-                    {"id": "h29", "q": "Sei como fazer para executar o meu trabalho?", "rev": False, "options": escala_conc, "help": "Exemplo: Recebeu a formação e as ferramentas certas para desempenhar bem a sua função."},
-                    {"id": "h30", "q": "Sei quais são os objetivos do meu departamento?", "rev": False, "options": escala_conc, "help": "Exemplo: Compreende para onde a sua equipa está a caminhar estrategicamente."},
-                    {"id": "h31", "q": "Tenho noção clara das minhas responsabilidades?", "rev": False, "options": escala_conc, "help": "Exemplo: Os limites da sua função, até onde pode agir e decidir, estão claros."},
+                    {"id": "h29", "q": "Sei como fazer para executar o meu trabalho?", "rev": False, "options": escala_conc, "help": "Exemplo: Você recebeu o treinamento e as ferramentas certas para desempenhar bem a sua função."},
+                    {"id": "h30", "q": "Sei quais são os objetivos do meu departamento?", "rev": False, "options": escala_conc, "help": "Exemplo: Compreende para onde a sua equipe está caminhando estrategicamente."},
+                    {"id": "h31", "q": "Tenho noção clara das minhas responsabilidades?", "rev": False, "options": escala_conc, "help": "Exemplo: Os limites da sua função, até onde pode agir e decidir, estão bem claros."},
                     {"id": "h32", "q": "Entendo a minha importância na empresa?", "rev": False, "options": escala_conc, "help": "Exemplo: Consegue ver como o seu trabalho diário ajuda no sucesso do negócio."}
                 ],
                 "Gestão de Mudança": [
@@ -199,36 +198,36 @@ if 'methodologies' not in st.session_state:
             }
         },
         "COPSOQ II (Versão Média PT)": {
-            "desc": "Versão Média Portuguesa Oficial (76 itens). Avalia de forma profunda exigências, saúde e valores no ambiente laboral.",
+            "desc": "Versão Média Oficial (76 itens - Adaptação PT-BR). Avalia de forma profunda exigências, saúde e valores no ambiente laboral.",
             "questions": {
                 "Exigências Laborais (Quantidade e Ritmo)": [
-                    {"id": "c1", "q": "A sua carga de trabalho acumula-se por ser mal distribuída?", "rev": True, "options": escala_freq},
-                    {"id": "c2", "q": "Com que frequência não tem tempo para completar todas as tarefas do seu trabalho?", "rev": True, "options": escala_freq},
-                    {"id": "c3", "q": "Precisa fazer horas-extra?", "rev": True, "options": escala_freq},
+                    {"id": "c1", "q": "Sua carga de trabalho se acumula por ser mal distribuída?", "rev": True, "options": escala_freq},
+                    {"id": "c2", "q": "Com que frequência você não tem tempo para completar todas as tarefas do seu trabalho?", "rev": True, "options": escala_freq},
+                    {"id": "c3", "q": "Precisa fazer horas extras?", "rev": True, "options": escala_freq},
                     {"id": "c4", "q": "Precisa trabalhar muito rapidamente?", "rev": True, "options": escala_freq},
                     {"id": "c5", "q": "O seu trabalho exige a sua atenção constante?", "rev": True, "options": escala_freq},
-                    {"id": "c6", "q": "O seu trabalho requer que seja bom a propor novas ideias?", "rev": False, "options": escala_freq},
+                    {"id": "c6", "q": "Seu trabalho exige que você seja bom em propor novas ideias?", "rev": False, "options": escala_freq},
                     {"id": "c7", "q": "O seu trabalho exige que tome decisões difíceis?", "rev": True, "options": escala_freq},
-                    {"id": "c8", "q": "O seu trabalho exige emocionalmente de si?", "rev": True, "options": escala_freq}
+                    {"id": "c8", "q": "Seu trabalho exige muito de você emocionalmente?", "rev": True, "options": escala_freq}
                 ],
                 "Organização e Influência": [
-                    {"id": "c9", "q": "Tem um elevado grau de influência no seu trabalho?", "rev": False, "options": escala_freq},
+                    {"id": "c9", "q": "Você tem um alto grau de influência no seu trabalho?", "rev": False, "options": escala_freq},
                     {"id": "c10", "q": "Participa na escolha das pessoas com quem trabalha?", "rev": False, "options": escala_freq},
-                    {"id": "c11", "q": "Pode influenciar a quantidade de trabalho que lhe compete a si?", "rev": False, "options": escala_freq},
+                    {"id": "c11", "q": "Pode influenciar a quantidade de trabalho que compete a você?", "rev": False, "options": escala_freq},
                     {"id": "c12", "q": "Tem alguma influência sobre o tipo de tarefas que faz?", "rev": False, "options": escala_freq},
                     {"id": "c13", "q": "O seu trabalho exige que tenha iniciativa?", "rev": False, "options": escala_freq},
-                    {"id": "c14", "q": "O seu trabalho permite-lhe aprender coisas novas?", "rev": False, "options": escala_freq},
-                    {"id": "c15", "q": "O seu trabalho permite-lhe usar as suas habilidades ou perícias?", "rev": False, "options": escala_freq},
-                    {"id": "c16", "q": "No seu local de trabalho, é informado com antecedência sobre decisões importantes, mudanças ou planos para o futuro?", "rev": False, "options": escala_freq},
-                    {"id": "c17", "q": "Recebe toda a informação de que necessita para fazer bem o seu trabalho?", "rev": False, "options": escala_freq}
+                    {"id": "c14", "q": "O seu trabalho permite que você aprenda coisas novas?", "rev": False, "options": escala_freq},
+                    {"id": "c15", "q": "O seu trabalho permite usar as suas habilidades ou talentos?", "rev": False, "options": escala_freq},
+                    {"id": "c16", "q": "No seu local de trabalho, você é informado com antecedência sobre decisões importantes ou mudanças?", "rev": False, "options": escala_freq},
+                    {"id": "c17", "q": "Recebe toda a informação que necessita para fazer bem o seu trabalho?", "rev": False, "options": escala_freq}
                 ],
                 "Transparência de Papel e Conflitos": [
-                    {"id": "c18", "q": "O seu trabalho apresenta objectivos claros?", "rev": False, "options": escala_freq},
-                    {"id": "c19", "q": "Sabe exactamente quais as suas responsabilidades?", "rev": False, "options": escala_freq},
-                    {"id": "c20", "q": "Sabe exactamente o que é esperado de si?", "rev": False, "options": escala_freq},
+                    {"id": "c18", "q": "Seu trabalho apresenta objetivos claros?", "rev": False, "options": escala_freq},
+                    {"id": "c19", "q": "Sabe exatamente quais são as suas responsabilidades?", "rev": False, "options": escala_freq},
+                    {"id": "c20", "q": "Sabe exatamente o que é esperado de você?", "rev": False, "options": escala_freq},
                     {"id": "c21", "q": "O seu trabalho é reconhecido e apreciado pela gerência?", "rev": False, "options": escala_freq},
-                    {"id": "c22", "q": "A gerência do seu local de trabalho respeita-o?", "rev": False, "options": escala_freq},
-                    {"id": "c23", "q": "É tratado de forma justa no seu local de trabalho?", "rev": False, "options": escala_freq},
+                    {"id": "c22", "q": "A gerência do seu local de trabalho respeita você?", "rev": False, "options": escala_freq},
+                    {"id": "c23", "q": "Você é tratado de forma justa no seu local de trabalho?", "rev": False, "options": escala_freq},
                     {"id": "c24", "q": "Faz coisas no seu trabalho que uns concordam mas outros não?", "rev": True, "options": escala_freq},
                     {"id": "c25", "q": "Por vezes tem que fazer coisas que deveriam ser feitas de outra maneira?", "rev": True, "options": escala_freq},
                     {"id": "c26", "q": "Por vezes tem que fazer coisas que considera desnecessárias?", "rev": True, "options": escala_freq}
@@ -236,62 +235,62 @@ if 'methodologies' not in st.session_state:
                 "Relações Sociais e Liderança": [
                     {"id": "c27", "q": "Com que frequência tem ajuda e apoio dos seus colegas de trabalho?", "rev": False, "options": escala_freq},
                     {"id": "c28", "q": "Com que frequência os seus colegas estão dispostos a ouvi-lo(a) sobre os seus problemas de trabalho?", "rev": False, "options": escala_freq},
-                    {"id": "c29", "q": "Com que frequência os seus colegas falam consigo acerca do seu desempenho laboral?", "rev": False, "options": escala_freq},
-                    {"id": "c30", "q": "Com que frequência o seu superior imediato fala consigo sobre como está a decorrer o seu trabalho?", "rev": False, "options": escala_freq},
+                    {"id": "c29", "q": "Com que frequência os seus colegas conversam com você sobre o seu desempenho?", "rev": False, "options": escala_freq},
+                    {"id": "c30", "q": "Com que frequência o seu superior imediato conversa com você sobre como está o andamento do seu trabalho?", "rev": False, "options": escala_freq},
                     {"id": "c31", "q": "Com que frequência tem ajuda e apoio do seu superior imediato?", "rev": False, "options": escala_freq},
-                    {"id": "c32", "q": "Com que frequência é que o seu superior imediato fala consigo em relação ao seu desempenho laboral?", "rev": False, "options": escala_freq},
-                    {"id": "c33", "q": "Existe um bom ambiente de trabalho entre si e os seus colegas?", "rev": False, "options": escala_freq},
+                    {"id": "c32", "q": "Com que frequência o seu superior imediato conversa com você em relação ao seu desempenho?", "rev": False, "options": escala_freq},
+                    {"id": "c33", "q": "Existe um bom ambiente de trabalho entre você e os seus colegas?", "rev": False, "options": escala_freq},
                     {"id": "c34", "q": "Existe uma boa cooperação entre os colegas de trabalho?", "rev": False, "options": escala_freq},
-                    {"id": "c35", "q": "No seu local de trabalho sente-se parte de uma comunidade?", "rev": False, "options": escala_freq},
-                    {"id": "c36", "q": "A sua chefia oferece aos indivíduos e ao grupo boas oportunidades de desenvolvimento?", "rev": False, "options": escala_freq},
-                    {"id": "c37", "q": "A sua chefia dá prioridade à satisfação no trabalho?", "rev": False, "options": escala_freq},
-                    {"id": "c38", "q": "A sua chefia é boa no planeamento do trabalho?", "rev": False, "options": escala_freq},
-                    {"id": "c39", "q": "A sua chefia é boa a resolver conflitos?", "rev": False, "options": escala_freq}
+                    {"id": "c35", "q": "No seu local de trabalho você sente que faz parte de uma comunidade?", "rev": False, "options": escala_freq},
+                    {"id": "c36", "q": "Sua chefia oferece para as pessoas e para a equipe boas oportunidades de desenvolvimento?", "rev": False, "options": escala_freq},
+                    {"id": "c37", "q": "Sua chefia dá prioridade à satisfação no trabalho?", "rev": False, "options": escala_freq},
+                    {"id": "c38", "q": "Sua chefia é boa no planejamento do trabalho?", "rev": False, "options": escala_freq},
+                    {"id": "c39", "q": "Sua chefia é boa em resolver conflitos?", "rev": False, "options": escala_freq}
                 ],
                 "Valores, Justiça e Confiança": [
-                    {"id": "c40", "q": "Os funcionários ocultam informações uns dos outros?", "rev": True, "options": escala_freq},
-                    {"id": "c41", "q": "Os funcionários ocultam informação à gerência?", "rev": True, "options": escala_freq},
-                    {"id": "c42", "q": "Os funcionários confiam uns nos outros de um modo geral?", "rev": False, "options": escala_freq},
-                    {"id": "c43", "q": "A gerência confia nos seus funcionários para fazerem o seu trabalho bem?", "rev": False, "options": escala_freq},
-                    {"id": "c44", "q": "Confia na informação que lhe é transmitida pela gerência?", "rev": False, "options": escala_freq},
-                    {"id": "c45", "q": "A gerência oculta informação aos seus funcionários?", "rev": True, "options": escala_freq},
+                    {"id": "c40", "q": "Os colaboradores ocultam informações uns dos outros?", "rev": True, "options": escala_freq},
+                    {"id": "c41", "q": "Os colaboradores ocultam informações da gerência?", "rev": True, "options": escala_freq},
+                    {"id": "c42", "q": "Os colaboradores confiam uns nos outros de um modo geral?", "rev": False, "options": escala_freq},
+                    {"id": "c43", "q": "A gerência confia nos colaboradores para fazerem o trabalho bem feito?", "rev": False, "options": escala_freq},
+                    {"id": "c44", "q": "Você confia na informação que é transmitida pela gerência?", "rev": False, "options": escala_freq},
+                    {"id": "c45", "q": "A gerência oculta informação aos seus colaboradores?", "rev": True, "options": escala_freq},
                     {"id": "c46", "q": "Os conflitos são resolvidos de uma forma justa?", "rev": False, "options": escala_freq},
-                    {"id": "c47", "q": "As sugestões dos funcionários são tratadas de forma séria pela gerência?", "rev": False, "options": escala_freq},
-                    {"id": "c48", "q": "O trabalho é igualmente distribuído pelos funcionários?", "rev": False, "options": escala_freq}
+                    {"id": "c47", "q": "As sugestões dos colaboradores são tratadas de forma séria pela gerência?", "rev": False, "options": escala_freq},
+                    {"id": "c48", "q": "O trabalho é igualmente distribuído pelos colaboradores?", "rev": False, "options": escala_freq}
                 ],
                 "Atitude e Satisfação": [
                     {"id": "c49", "q": "Sou sempre capaz de resolver problemas, se tentar o suficiente.", "rev": False, "options": escala_int},
-                    {"id": "c50", "q": "É-me fácil seguir os meus planos e atingir os meus objectivos.", "rev": False, "options": escala_int},
-                    {"id": "c51", "q": "O seu trabalho tem algum significado para si?", "rev": False, "options": escala_int},
-                    {"id": "c52", "q": "Sente que o seu trabalho é importante?", "rev": False, "options": escala_int},
+                    {"id": "c50", "q": "É fácil para mim seguir os meus planos e atingir os meus objetivos.", "rev": False, "options": escala_int},
+                    {"id": "c51", "q": "O seu trabalho tem algum significado para você?", "rev": False, "options": escala_int},
+                    {"id": "c52", "q": "Você sente que o seu trabalho é importante?", "rev": False, "options": escala_int},
                     {"id": "c53", "q": "Sente-se motivado e envolvido com o seu trabalho?", "rev": False, "options": escala_int},
-                    {"id": "c54", "q": "Gosta de falar com os outros sobre o seu local de trabalho?", "rev": False, "options": escala_int},
-                    {"id": "c55", "q": "Sente que os problemas do seu local de trabalho são seus também?", "rev": False, "options": escala_int},
-                    {"id": "c56", "q": "Em relação ao seu trabalho, quão satisfeito está com as suas perspectivas de trabalho?", "rev": False, "options": escala_sat},
-                    {"id": "c57", "q": "Em relação ao seu trabalho, quão satisfeito está com as condições físicas do seu local de trabalho?", "rev": False, "options": escala_sat},
-                    {"id": "c58", "q": "Em relação ao seu trabalho, quão satisfeito está com a forma como as suas capacidades são utilizadas?", "rev": False, "options": escala_sat},
-                    {"id": "c59", "q": "Quão satisfeito está com o seu trabalho de uma forma global?", "rev": False, "options": escala_sat},
-                    {"id": "c60", "q": "Sente-se preocupado em ficar desempregado?", "rev": True, "options": escala_int}
+                    {"id": "c54", "q": "Você gosta de falar com outras pessoas sobre o seu local de trabalho?", "rev": False, "options": escala_int},
+                    {"id": "c55", "q": "Você sente que os problemas do seu local de trabalho também são seus?", "rev": False, "options": escala_int},
+                    {"id": "c56", "q": "Em relação ao seu trabalho, quão satisfeito você está com as suas perspectivas profissionais?", "rev": False, "options": escala_sat},
+                    {"id": "c57", "q": "Em relação ao seu trabalho, quão satisfeito você está com as condições físicas do seu local de trabalho?", "rev": False, "options": escala_sat},
+                    {"id": "c58", "q": "Em relação ao seu trabalho, quão satisfeito você está com a forma como as suas capacidades são utilizadas?", "rev": False, "options": escala_sat},
+                    {"id": "c59", "q": "Quão satisfeito você está com o seu trabalho de uma forma global?", "rev": False, "options": escala_sat},
+                    {"id": "c60", "q": "Você se preocupa em ficar desempregado?", "rev": True, "options": escala_int}
                 ],
-                "Interface Trabalho-Família e Saúde": [
-                    {"id": "c61", "q": "Em geral, sente que a sua saúde é:", "rev": False, "options": escala_sau},
-                    {"id": "c62", "q": "Sente que o seu trabalho lhe exige muita energia que acaba por afectar a sua vida privada negativamente?", "rev": True, "options": escala_int},
-                    {"id": "c63", "q": "Sente que o seu trabalho lhe exige muito tempo que acaba por afectar a sua vida privada negativamente?", "rev": True, "options": escala_int},
-                    {"id": "c64", "q": "A sua família e os seus amigos dizem-lhe que trabalha demais?", "rev": True, "options": escala_int},
-                    {"id": "c65", "q": "Com que frequência nas últimas 4 semanas sentiu dificuldade a adormecer?", "rev": True, "options": escala_freq},
-                    {"id": "c66", "q": "Com que frequência nas últimas 4 semanas acordou várias vezes durante a noite e depois não conseguia adormecer?", "rev": True, "options": escala_freq},
-                    {"id": "c67", "q": "Com que frequência nas últimas 4 semanas sentiu-se fisicamente exausto?", "rev": True, "options": escala_freq},
-                    {"id": "c68", "q": "Com que frequência nas últimas 4 semanas sentiu-se emocionalmente exausto?", "rev": True, "options": escala_freq},
-                    {"id": "c69", "q": "Com que frequência nas últimas 4 semanas sentiu-se irritado?", "rev": True, "options": escala_freq},
-                    {"id": "c70", "q": "Com que frequência nas últimas 4 semanas sentiu-se ansioso?", "rev": True, "options": escala_freq},
-                    {"id": "c71", "q": "Com que frequência nas últimas 4 semanas sentiu-se triste?", "rev": True, "options": escala_freq},
-                    {"id": "c72", "q": "Com que frequência nas últimas 4 semanas sentiu falta de interesse por coisas quotidianas?", "rev": True, "options": escala_freq}
+                "Saúde, Bem-estar e Rotina": [
+                    {"id": "c61", "q": "Em geral, você sente que a sua saúde é:", "rev": False, "options": escala_sau},
+                    {"id": "c62", "q": "Sente que o seu trabalho exige muita energia que acaba por afetar a sua vida privada negativamente?", "rev": True, "options": escala_int},
+                    {"id": "c63", "q": "Sente que o seu trabalho exige muito tempo que acaba por afetar a sua vida privada negativamente?", "rev": True, "options": escala_int},
+                    {"id": "c64", "q": "Sua família e amigos dizem que você trabalha demais?", "rev": True, "options": escala_int},
+                    {"id": "c65", "q": "Com que frequência nas últimas 4 semanas você sentiu dificuldade para adormecer?", "rev": True, "options": escala_freq},
+                    {"id": "c66", "q": "Com que frequência nas últimas 4 semanas você acordou várias vezes durante a noite e depois não conseguia adormecer?", "rev": True, "options": escala_freq},
+                    {"id": "c67", "q": "Com que frequência nas últimas 4 semanas você sentiu-se fisicamente exausto?", "rev": True, "options": escala_freq},
+                    {"id": "c68", "q": "Com que frequência nas últimas 4 semanas você sentiu-se emocionalmente exausto?", "rev": True, "options": escala_freq},
+                    {"id": "c69", "q": "Com que frequência nas últimas 4 semanas você sentiu-se irritado?", "rev": True, "options": escala_freq},
+                    {"id": "c70", "q": "Com que frequência nas últimas 4 semanas você sentiu-se ansioso?", "rev": True, "options": escala_freq},
+                    {"id": "c71", "q": "Com que frequência nas últimas 4 semanas você sentiu-se triste?", "rev": True, "options": escala_freq},
+                    {"id": "c72", "q": "Com que frequência nas últimas 4 semanas você sentiu falta de interesse pelas coisas do dia a dia?", "rev": True, "options": escala_freq}
                 ],
                 "Ambiente Ofensivo (Últimos 12 meses)": [
-                    {"id": "c73", "q": "Tem sido alvo de insultos ou provocações verbais?", "rev": True, "options": escala_freq},
+                    {"id": "c73", "q": "Tem sido alvo de insultos ou provocações verbais no trabalho?", "rev": True, "options": escala_freq},
                     {"id": "c74", "q": "Tem sido exposto a assédio sexual indesejado?", "rev": True, "options": escala_freq},
                     {"id": "c75", "q": "Tem sido exposto a ameaças de violência?", "rev": True, "options": escala_freq},
-                    {"id": "c76", "q": "Tem sido exposto a violência física?", "rev": True, "options": escala_freq}
+                    {"id": "c76", "q": "Tem sido exposto a agressão física?", "rev": True, "options": escala_freq}
                 ]
             }
         }
@@ -548,7 +547,7 @@ def delete_user(username):
     if username in st.session_state.users_db:
         del st.session_state.users_db[username]
     
-    st.success(f"✅ O utilizador [{username}] foi removido com sucesso!")
+    st.success(f"✅ O usuário [{username}] foi removido com sucesso!")
     time.sleep(1)
     st.rerun()
 
@@ -565,14 +564,14 @@ def kpi_card(title, value, icon, color_class):
 
 def gerar_analise_robusta(dimensoes):
     riscos = [k for k, v in dimensoes.items() if v < 3.0 and v > 0]
-    texto = "O presente diagnóstico mapeou os principais indicadores de saúde e bem-estar no ambiente de trabalho da equipa. A avaliação foi baseada em rigorosas metodologias de saúde ocupacional. "
+    texto = "O presente diagnóstico mapeou os principais indicadores de saúde e bem-estar no ambiente de trabalho da equipe. A avaliação foi baseada em rigorosas metodologias de saúde ocupacional. "
     
     if riscos:
-        texto += f"A análise revela que os fatores associados a **{', '.join(riscos)}** requerem atenção especial por parte da liderança, pois apresentam resultados abaixo do recomendável (Score Inferior a 3.0). Quando não geridos adequadamente, estes fatores podem contribuir para o aumento do stress, desgaste emocional e rotatividade na equipa. "
+        texto += f"A análise revela que os fatores associados a **{', '.join(riscos)}** requerem atenção especial por parte da liderança, pois apresentam resultados abaixo do recomendável (Score Inferior a 3.0). Quando não gerenciados adequadamente, estes fatores podem contribuir para o aumento do estresse, desgaste emocional e rotatividade na equipe. "
     else:
         texto += "Os resultados indicam um ambiente de trabalho globalmente saudável, equilibrado e com bons níveis de proteção e bem-estar. As métricas avaliadas encontram-se dentro de parâmetros muito positivos. "
     
-    texto += "Recomendamos que as lideranças e a equipa de RH analisem as ações propostas a seguir, procurando aplicar melhorias contínuas para fortalecer ainda mais o clima organizacional."
+    texto += "Recomendamos que as lideranças e a equipe de RH analisem as ações propostas a seguir, procurando aplicar melhorias contínuas para fortalecer ainda mais o clima organizacional."
     return texto
 
 def gerar_banco_sugestoes(dimensoes):
@@ -582,17 +581,17 @@ def gerar_banco_sugestoes(dimensoes):
     if dimensoes.get("Demandas", 5) < 3.8 or dimensoes.get("Exigências Laborais e Ritmo", 5) < 3.8:
         sugestoes.append({
             "acao": "Avaliação de Carga de Trabalho", 
-            "estrat": "Analisar as rotinas das equipas para identificar sobrecargas, tarefas em duplicado e oportunidades para melhor distribuição do trabalho diário.", 
+            "estrat": "Analisar as rotinas das equipes para identificar sobrecargas, tarefas duplicadas e oportunidades para melhor distribuição do trabalho diário.", 
             "area": "Gestão de Demandas", "resp": "Coordenação de Área", "prazo": "30 a 60 dias"
         })
         sugestoes.append({
             "acao": "Matriz de Prioridades", 
-            "estrat": "Ajudar as equipas a organizar melhor o tempo, separando o que é urgente do que é importante, evitando o desgaste de trabalhar sempre no limite.", 
-            "area": "Gestão de Demandas", "resp": "Líderes de Equipa", "prazo": "15 dias"
+            "estrat": "Ajudar as equipes a organizar melhor o tempo, separando o que é urgente do que é importante, evitando o desgaste de trabalhar sempre no limite.", 
+            "area": "Gestão de Demandas", "resp": "Líderes de Equipe", "prazo": "15 dias"
         })
         sugestoes.append({
             "acao": "Política de Desconexão", 
-            "estrat": "Criar combinados claros com a equipa sobre o respeito pelos horários de descanso, evitando e-mails e mensagens de trabalho fora do expediente.", 
+            "estrat": "Criar combinados claros com a equipe sobre o respeito aos horários de descanso, evitando e-mails e mensagens de trabalho fora do expediente.", 
             "area": "Gestão de Demandas", "resp": "Recursos Humanos", "prazo": "30 dias"
         })
         
@@ -605,15 +604,15 @@ def gerar_banco_sugestoes(dimensoes):
         })
         sugestoes.append({
             "acao": "Maior Participação nas Decisões", 
-            "estrat": "Envolver mais a equipa antes de implementar novos sistemas ou mudanças nas rotinas, ouvindo quem está no terreno a executar a tarefa.", 
-            "area": "Autonomia e Organização", "resp": "Líderes de Equipa", "prazo": "Ação Contínua"
+            "estrat": "Envolver mais a equipe antes de implementar novos sistemas ou mudanças nas rotinas, ouvindo quem está no terreno executando a tarefa.", 
+            "area": "Autonomia e Organização", "resp": "Líderes de Equipe", "prazo": "Ação Contínua"
         })
         
     # ------------------ BLOCO: SUPORTE GESTÃO E EQUIPE ------------------
     if dimensoes.get("Suporte do Gestor", 5) < 3.8 or dimensoes.get("Suporte dos Colegas", 5) < 3.8 or dimensoes.get("Relações e Liderança", 5) < 3.8:
         sugestoes.append({
             "acao": "Desenvolvimento de Lideranças", 
-            "estrat": "Capacitar os gestores em competências de empatia, escuta ativa e comunicação construtiva, focando no desenvolvimento humano da equipa.", 
+            "estrat": "Capacitar os gestores em competências de empatia, escuta ativa e comunicação construtiva, focando no desenvolvimento humano da equipe.", 
             "area": "Suporte e Liderança", "resp": "Recursos Humanos", "prazo": "90 dias"
         })
         sugestoes.append({
@@ -623,7 +622,7 @@ def gerar_banco_sugestoes(dimensoes):
         })
         sugestoes.append({
             "acao": "Cultura de Reconhecimento", 
-            "estrat": "Celebrar abertamente as pequenas e grandes vitórias da equipa, criando o hábito do elogio sincero pelo bom trabalho realizado.", 
+            "estrat": "Celebrar abertamente as pequenas e grandes vitórias da equipe, criando o hábito do elogio sincero pelo bom trabalho realizado.", 
             "area": "Suporte e Liderança", "resp": "Direção e Gestão", "prazo": "Ação Contínua"
         })
         
@@ -636,7 +635,7 @@ def gerar_banco_sugestoes(dimensoes):
         })
         sugestoes.append({
             "acao": "Canal de Escuta Segura", 
-            "estrat": "Disponibilizar um meio seguro e confidencial para que as pessoas possam relatar problemas graves de convivência sem receio de represálias.", 
+            "estrat": "Disponibilizar um canal seguro e confidencial para que as pessoas possam relatar problemas graves de convivência sem receio de represálias.", 
             "area": "Clima e Relações", "resp": "Recursos Humanos", "prazo": "60 dias"
         })
         
@@ -644,11 +643,11 @@ def gerar_banco_sugestoes(dimensoes):
     if dimensoes.get("Papel na Empresa", 5) < 3.8 or dimensoes.get("Valores, Justiça e Confiança", 5) < 3.8:
         sugestoes.append({
             "acao": "Clareza de Funções e Expectativas", 
-            "estrat": "Rever a descrição das funções juntamente com os colaboradores para garantir que todos sabem exatamente o que se espera do seu trabalho.", 
+            "estrat": "Rever a descrição das funções junto aos colaboradores para garantir que todos sabem exatamente o que se espera do seu trabalho.", 
             "area": "Sentido e Propósito", "resp": "Recursos Humanos", "prazo": "90 dias"
         })
         sugestoes.append({
-            "acao": "Partilha de Propósito", 
+            "acao": "Compartilhamento de Propósito", 
             "estrat": "Comunicar com transparência como o esforço diário de cada pessoa ajuda a empresa a atingir os seus grandes objetivos.", 
             "area": "Sentido e Propósito", "resp": "Direção Executiva", "prazo": "Trimestral"
         })
@@ -672,13 +671,13 @@ def gerar_banco_sugestoes(dimensoes):
     # ------------------ FALLBACK (BOM CENÁRIO GERAL) ------------------
     if not sugestoes:
         sugestoes.append({
-            "acao": "Monitorização de Clima Contínua", 
+            "acao": "Monitoramento Contínuo de Clima", 
             "estrat": "Manter a realização periódica de conversas e questionários rápidos para garantir que o bom ambiente de trabalho atual se sustenta no futuro.", 
             "area": "Estratégia Geral de RH", "resp": "Recursos Humanos", "prazo": "Ação Contínua"
         })
         sugestoes.append({
             "acao": "Incentivo à Qualidade de Vida", 
-            "estrat": "Promover iniciativas leves no escritório e benefícios focados na qualidade de vida e saúde mental preventiva das equipas.", 
+            "estrat": "Promover iniciativas leves no escritório e benefícios focados na qualidade de vida e saúde mental preventiva das equipes.", 
             "area": "Estratégia Geral de RH", "resp": "Recursos Humanos", "prazo": "Plano Anual"
         })
         
@@ -701,7 +700,7 @@ def login_screen():
             user = st.text_input("Seu Usuário de Acesso")
             pwd = st.text_input("Sua Senha", type="password")
             
-            if st.form_submit_button("Aceder ao Painel", type="primary", use_container_width=True):
+            if st.form_submit_button("Acessar o Painel", type="primary", use_container_width=True):
                 login_ok = False
                 user_role_type = "Analista"
                 user_credits = 0
@@ -728,7 +727,7 @@ def login_screen():
                 if login_ok:
                     valid_until = user_data.get('valid_until')
                     if valid_until and datetime.datetime.today().isoformat() > valid_until:
-                        st.error("🔒 O seu acesso atingiu a data de validade. Por favor, fale connosco para o renovar.")
+                        st.error("🔒 O seu acesso atingiu a data de validade. Por favor, fale conosco para renovar.")
                     else:
                         st.session_state.logged_in = True
                         st.session_state.user_role = 'admin'
@@ -744,7 +743,7 @@ def login_screen():
                         
                         st.rerun()
                 else: 
-                    st.error("⚠️ Não conseguimos encontrar este utilizador ou a senha está incorreta. Tente novamente.")
+                    st.error("⚠️ Não conseguimos encontrar este usuário ou a senha está incorreta. Tente novamente.")
                     
 
 def admin_dashboard():
@@ -1000,7 +999,7 @@ def admin_dashboard():
                 st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
                 with st.form("add_comp_form_gigante"):
                     if credits_left <= 0 and perm != "Master":
-                        st.error("🚫 O seu plano atingiu o limite de avaliações disponíveis. Contacte-nos para adquirir mais.")
+                        st.error("🚫 O seu plano atingiu o limite de avaliações disponíveis. Fale conosco para adquirir mais.")
                         st.form_submit_button("Ação Bloqueada", disabled=True)
                     else:
                         st.write("### Dados da Empresa")
@@ -1032,7 +1031,7 @@ def admin_dashboard():
                         
                         st.markdown("---")
                         st.write("### Acesso Exclusivo para o Cliente (Portal do Analista)")
-                        st.caption("Crie aqui um acesso para que a equipa de RH do cliente possa visualizar os seus próprios resultados e dashboards.")
+                        st.caption("Crie aqui um acesso para que a equipe de RH do cliente possa visualizar os seus próprios resultados e dashboards.")
                         u_login = st.text_input("Usuário de Acesso")
                         u_pass = st.text_input("Senha de Acesso", type="password")
 
@@ -1194,29 +1193,29 @@ def admin_dashboard():
             
             st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
             st.markdown("##### 💬 Sugestão de Mensagem de Convite (WhatsApp / E-mail)")
-            texto_convite = f"""Olá, equipa da {empresa['razao']}! 👋
+            texto_convite = f"""Olá, equipe da {empresa['razao']}! 👋
 
 Cuidar dos nossos resultados é muito importante, mas nada disso faz sentido se não cuidarmos, em primeiro lugar, de quem faz tudo acontecer: vocês.
 
-Para construirmos um ambiente de trabalho cada vez melhor, mais leve e saudável, precisamos muito da vossa ajuda e transparência. Estamos a lançar a nossa Pesquisa de Clima e Bem-Estar no Trabalho. 
+Para construirmos um ambiente de trabalho cada vez melhor, mais leve e saudável, precisamos muito da ajuda e transparência de vocês. Estamos lançando a nossa Pesquisa de Clima e Bem-Estar no Trabalho. 
 
-🧠 **Por que a vossa participação é tão importante?**
-O vosso dia a dia importa. Muitas vezes o stress ou a sobrecarga são invisíveis. Responder a este breve questionário permite-nos enxergar exatamente onde podemos melhorar, criar novas iniciativas de apoio e corrigir aquilo que não está a funcionar tão bem. É a vossa voz a guiar o nosso trabalho.
+🧠 **Por que a participação de vocês é tão importante?**
+O dia a dia de vocês importa. Muitas vezes o estresse ou a sobrecarga são invisíveis. Responder a este breve questionário permite que a gente veja exatamente onde podemos melhorar, criar novas iniciativas de apoio e corrigir aquilo que não está funcionando tão bem. É a sua voz guiando o nosso trabalho.
 
 🔒 **Privacidade 100% Garantida**
 Compreendemos que falar sobre o ambiente de trabalho requer total confiança. Por isso:
 - **Anonimato Total:** Utilizamos um sistema seguro onde nenhuma resposta individual consegue ser ligada à pessoa. 
-- **Foco na Equipa:** Os resultados chegam até à gestão apenas em formato de gráficos e médias do grupo todo, nunca individuais. Sintam-se perfeitamente seguros e à vontade para serem 100% sinceros.
+- **Foco na Equipe:** Os resultados chegam até a gestão apenas em formato de gráficos e médias do grupo todo, nunca individuais. Sintam-se perfeitamente seguros e à vontade para serem 100% sinceros.
 
 🚀 **Como participar?**
-A avaliação leva apenas cerca de 7 minutos. Cliquem no link seguro abaixo através do vosso telemóvel ou computador:
+A avaliação leva apenas cerca de 7 minutos. Cliquem no link seguro abaixo através do seu celular ou computador:
 
-🔗 Aceder à Pesquisa: {link_final}
+🔗 Acessar a Pesquisa: {link_final}
 
-Agradecemos imenso o vosso tempo e a vossa partilha. Só com a vossa honestidade é que conseguiremos fazer do nosso espaço, um lugar cada vez melhor para todos.
+Agradecemos imensamente o seu tempo e o seu compartilhamento. Só com a sua honestidade é que conseguiremos fazer do nosso espaço, um lugar cada vez melhor para todos.
 
-Com os nossos melhores cumprimentos,
-Equipa de Recursos Humanos e Liderança"""
+Atenciosamente,
+Equipe de Recursos Humanos e Liderança"""
             st.text_area("Pode copiar e adaptar o modelo abaixo para enviar aos colaboradores:", value=texto_convite, height=450)
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -1387,7 +1386,7 @@ Equipa de Recursos Humanos e Liderança"""
                     <div style="position: absolute; left: 0; top: 0; width: {score_width_css}%; background: linear-gradient(90deg, {COR_PRIMARIA} 0%, {COR_SECUNDARIA} 100%); height: 16px; border-radius: 8px;"></div>
                 </div>
                 <div style="font-size: 10px; color: #7f8c8d; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
-                    Grau Global de Saúde e Bem-Estar da Equipa
+                    Grau Global de Saúde e Bem-Estar da Equipe
                 </div>
             </div>
             """
@@ -1547,7 +1546,7 @@ Equipa de Recursos Humanos e Liderança"""
 
                 <h4>1. OBJETIVO DA AVALIAÇÃO</h4>
                 <p style="text-align: justify; font-size: 11px; color: #555;">
-                    O presente relatório executivo baseia-se nas normas e práticas validadas da metodologia <strong>{metodo_ativo}</strong>. O principal objetivo desta avaliação é identificar, com rigor, a extensão dos fatores de bem-estar ou o nível de desgaste presente no ambiente de trabalho das equipas da organização avaliada.<br><br>Através da participação anónima da equipa e de ferramentas matemáticas robustas na nuvem, conseguimos mapear a realidade da organização de uma forma que atende plenamente às diretrizes e boas práticas exigidas pelo Ministério relativas à prevenção e Gestão de Riscos Ocupacionais (GRO/PGR).
+                    O presente relatório executivo baseia-se nas normas e práticas validadas da metodologia <strong>{metodo_ativo}</strong>. O principal objetivo desta avaliação é identificar, com rigor, a extensão dos fatores de bem-estar ou o nível de desgaste presente no ambiente de trabalho das equipes da organização avaliada.<br><br>Através da participação anônima da equipe e de ferramentas matemáticas robustas na nuvem, conseguimos mapear a realidade da organização de uma forma que atende plenamente às diretrizes e boas práticas exigidas pelo Ministério relativas à prevenção e Gestão de Riscos Ocupacionais (GRO/PGR).
                 </p>
 
                 <div class="colunas-flex">
@@ -1566,9 +1565,9 @@ Equipa de Recursos Humanos e Liderança"""
                     {html_dimensoes}
                 </div>
 
-                <h4>5. VARREDURA RAIO-X REPASSANDO EXAUSTIVAMENTE OS FATORES AVALIADOS COM A EQUIPA</h4>
+                <h4>5. VARREDURA RAIO-X REPASSANDO EXAUSTIVAMENTE OS FATORES AVALIADOS COM A EQUIPE</h4>
                 <p style="font-size: 10px; color: #777; margin-bottom: 15px; margin-top: -10px; font-style: italic;">
-                    Nota técnica para interpretação: As representações visuais abaixo mostram de forma simples o nível percentual de risco contínuo detetado para cada situação. Barras com percentagens altas (cores mais quentes como laranja e vermelho) representam áreas que devem ser abordadas prioritariamente pela Gestão e pelos Recursos Humanos.
+                    Nota técnica para interpretação: As representações visuais abaixo mostram de forma simples o nível percentual de risco contínuo detectado para cada situação. Barras com porcentagens altas (cores mais quentes como laranja e vermelho) representam áreas que devem ser abordadas prioritariamente pela Gestão e pelos Recursos Humanos.
                 </p>
                 <div class="grid-raiox">
                     {html_x}
@@ -1578,7 +1577,7 @@ Equipa de Recursos Humanos e Liderança"""
 
                 <h4>6. PLANO DE AÇÃO ESTRATÉGICO SUGERIDO (COMPLIANCE E PREVENÇÃO)</h4>
                 <p style="font-size: 10px; color: #777; margin-bottom: 15px; margin-top: -10px; font-style: italic;">
-                    As sugestões descritas na tabela de apoio que se segue foram refinadas sob intervenção humana e com base nos scores recolhidos. As estratégias procuram atacar as maiores fragilidades encontradas no radar e no mapeamento comportamental com sugestões práticas aplicáveis.
+                    As sugestões descritas na tabela de apoio que se segue foram refinadas sob intervenção humana e com base nos scores coletados. As estratégias procuram atacar as maiores fragilidades encontradas no radar e no mapeamento comportamental com sugestões práticas aplicáveis.
                 </p>
                 <table style="width: 100%; border-collapse: collapse; font-size: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-shadow: 0 0 0 1px #eef2f5; border-radius: 8px; overflow: hidden;">
                     <thead>
@@ -1609,7 +1608,7 @@ Equipa de Recursos Humanos e Liderança"""
                     <div style="flex: 1; text-align: center; border-top: 1px solid #2c3e50; padding-top: 12px;">
                         <div style="font-weight: 800; font-size: 12px; color: #2c3e50; text-transform: uppercase;">{sig_tecnico_nome}</div>
                         <div style="color: #7f8c8d; font-size: 10px; margin-top: 4px;">{sig_tecnico_cargo}</div>
-                        <div style="color: #95a5a6; font-size: 9px; margin-top: 2px;">Chancela Técnica Eletrônica da Avalista Pericial</div>
+                        <div style="color: #95a5a6; font-size: 9px; margin-top: 2px;">Chancela Técnica Eletrônica do Avaliador(a) Pericial</div>
                     </div>
                 </div>
                 
@@ -1641,7 +1640,7 @@ Equipa de Recursos Humanos e Liderança"""
             </a>
             """, unsafe_allow_html=True)
             
-            st.info("💡 **Dica de Consultoria (Como extrair um PDF perfeito):** Após o ficheiro ser transferido, clique para abri-lo no seu navegador. A seguir, pressione `Ctrl + P` (ou `Cmd + P` no Mac) e escolha a opção para **Salvar como PDF**. Desative a impressão de Cabeçalhos e Rodapés e ative sempre os **'Gráficos de Plano de Fundo'** para que todas as cores da nossa marca fiquem intactas no papel.")
+            st.info("💡 **Dica de Consultoria (Como extrair um PDF perfeito):** Após o arquivo ser baixado, clique para abri-lo no seu navegador. Em seguida, pressione `Ctrl + P` (ou `Cmd + P` no Mac) e escolha a opção para **Salvar como PDF**. Desative a impressão de Cabeçalhos e Rodapés e ative sempre os **'Gráficos de Plano de Fundo'** para que todas as cores da nossa marca fiquem intactas no papel.")
             
             st.markdown("<hr>", unsafe_allow_html=True)
             st.subheader("Visualização da Estrutura Final do Relatório (Preview):")
@@ -1662,7 +1661,7 @@ Equipa de Recursos Humanos e Liderança"""
             history_data = generate_real_history(empresa['id'], responses_data, questoes_ativas, empresa.get('func', 1))
             
             if not history_data:
-                st.info("ℹ️ Ops! Ainda não temos avaliações antigas para fazer a comparação. As métricas vão aparecer aqui no próximo ciclo de avaliação desta equipa.")
+                st.info("ℹ️ Ops! Ainda não temos avaliações antigas para fazer a comparação. As métricas vão aparecer aqui no próximo ciclo de avaliação desta equipe.")
             else:
                 tab_evo, tab_comp = st.tabs(["📈 Evolução do Score Geral", "⚖️ Comparativo de Dimensões (Radar A x B)"])
                 
@@ -1694,7 +1693,7 @@ Equipa de Recursos Humanos e Liderança"""
                     if len(history_data) < 2:
                         st.warning("⚠️ Ainda não temos dados suficientes para ancorar um comparativo. Precisamos de avaliações em pelo menos dois períodos diferentes.")
                     else:
-                        st.write("Defina as datas que deseja comparar para perceber se o plano de ação resultou.")
+                        st.write("Defina as datas que deseja comparar para entender se o plano de ação resultou.")
                         c1, c2 = st.columns(2)
                         periodo_a = c1.selectbox("Período A (Referência Anterior)", [h['periodo'] for h in history_data], index=1)
                         periodo_b = c2.selectbox("Período B (Avaliação Atual)", [h['periodo'] for h in history_data], index=0)
@@ -1736,7 +1735,7 @@ Equipa de Recursos Humanos e Liderança"""
                                  logo_html = get_logo_html(150)
                                  
                                  diff_score = dados_b['score'] - dados_a['score']
-                                 txt_evolucao = "uma melhoria clara na estabilidade mental das equipas." if diff_score > 0 else "um momento que exige muita vigilância e atuação imediata devido à queda geral nas notas das equipas."
+                                 txt_evolucao = "uma melhoria clara na estabilidade mental das equipes." if diff_score > 0 else "um momento que exige muita vigilância e atuação imediata devido à queda geral nas notas das equipes."
                                  
                                  chart_css_viz = f"""
                                  <div style="padding: 25px; border: 1px solid #e0e6ed; border-radius: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
@@ -1813,7 +1812,7 @@ Equipa de Recursos Humanos e Liderança"""
                                              <td style="font-weight:900; color:{'#27ae60' if diff_score > 0 else '#c0392b'};">{diff_score:+.2f} pts</td>
                                          </tr>
                                          <tr>
-                                             <td>Taxa Bruta de Adesão Censitária das Equipas (%)</td>
+                                             <td>Taxa Bruta de Adesão Censitária das Equipes (%)</td>
                                              <td>{dados_a['adesao']}%</td>
                                              <td>{dados_b['adesao']}%</td>
                                              <td style="font-weight:bold; color:#7f8c8d;">{(dados_b['adesao'] - dados_a['adesao']):+.1f}%</td>
@@ -1877,7 +1876,7 @@ Equipa de Recursos Humanos e Liderança"""
                 new_p = c2.text_input("Senha", type="password")
                 new_r = st.selectbox("Nível de Acesso", ["Master", "Gestor", "Analista"])
                 
-                if st.button("➕ Confirmar Criação do Utilizador", type="primary"):
+                if st.button("➕ Confirmar Criação do Usuário", type="primary"):
                     if not new_u or not new_p: 
                         st.error("Usuário e Senha são campos obrigatórios.")
                     else:
@@ -1944,7 +1943,7 @@ Equipa de Recursos Humanos e Liderança"""
             with t3:
                 st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
                 st.write("### Configurações de Servidor (URL)")
-                base = st.text_input("Morada Web Atual (Crucial para os links enviados aos colaboradores funcionarem)", value=st.session_state.platform_config.get('base_url', ''))
+                base = st.text_input("Endereço Web Atual (Crucial para os links enviados aos colaboradores funcionarem)", value=st.session_state.platform_config.get('base_url', ''))
                 
                 if st.button("🔗 Gravar e Atualizar URL do Sistema", type="primary"):
                     new_conf = st.session_state.platform_config.copy()
@@ -1975,12 +1974,13 @@ Equipa de Recursos Humanos e Liderança"""
                     st.error("🔴 Nota Limiar: A sua interligação ao Cofre Cloud não logrou autenticar por motivos de rede. De momento está no regime 'offline' da sua máquina. O aplicativo foi reposto e corre pela memória provisória do browser. Qualquer refresh que seja feito ou F5 poderá levar à perda definitiva do processo que está na memória.")
                 st.markdown("</div>", unsafe_allow_html=True)
         else:
-            st.error("🚫 Apenas Administradores do nível 'Master' (Sénior) têm luz verde para transitar e consultar as fundações técnicas nesta página do programa.")
+            st.error("🚫 Apenas Administradores do nível 'Master' (Sênior) têm permissão para acessar esta página do programa.")
 
 # ==============================================================================
 # 6. MÓDULO DOS COLABORADORES (A PESQUISA DE CLIMA E SAÚDE)
 # ==============================================================================
 def survey_screen():
+    """A interface limpa e acolhedora onde as equipes respondem à avaliação de forma sigilosa e leve."""
     cod = st.query_params.get("cod")
     
     comp = None
@@ -1994,7 +1994,7 @@ def survey_screen():
         comp = next((c for c in st.session_state.companies_db if c['id'] == cod), None)
     
     if not comp: 
-        st.error("❌ Código de Rastreio Inválido. Pedimos que tente novamente entrar e confirme junto do líder de Recursos Humanos se o seu link foi bem encaminhado e enviado sem erro de digitação.")
+        st.error("❌ Código de Rastreio Inválido. Pedimos que tente acessar novamente e confirme junto ao líder de Recursos Humanos se o seu link foi bem encaminhado e enviado sem erro de digitação.")
         return
 
     if comp.get('valid_until'):
@@ -2007,7 +2007,7 @@ def survey_screen():
     limit_evals = comp.get('limit_evals', 999999)
     resp_count = comp.get('respondidas', 0) if comp.get('respondidas') is not None else 0
     if resp_count >= limit_evals:
-        st.error("⚠️ Pedimos desculpa. Infelizmente já foi atingido o número limite de respostas para este projeto em particular. Obrigado pela boa vontade em partilhar e apoiar.")
+        st.error("⚠️ Pedimos desculpas. Infelizmente já foi atingido o número limite de respostas para este projeto em particular. Obrigado pela boa vontade em compartilhar e apoiar.")
         return
     
     metodo_nome = comp.get('metodologia', 'HSE-IT (35 itens)')
@@ -2023,10 +2023,10 @@ def survey_screen():
     st.markdown("""
         <div class='security-alert'>
             <strong>🔒 A SUA PRIVACIDADE É A NOSSA PRIORIDADE</strong><br>
-            A sua chefia direta, colegas ou liderança <strong>não terão acesso</strong> a ler o que você escreve individualmente e assinala agora nesta tela.<br>
+            Sua chefia direta, colegas ou liderança <strong>não terão acesso</strong> a ler o que você escreve individualmente e assinala agora nesta tela.<br>
             <ul>
-                <li>Pedimos a sua identificação de NIF ou CPF para a validação pura de segurança anti-duplicação, mas fique totalmente tranquilo(a): assim que clica em enviar, os nossos robôs no código escondem os números de identificação pessoal blindando-os de forma 100% segura que ninguém, na sua hierarquia atual de empresa pode identificar a titularidade.</li>
-                <li>As estatísticas e gráficos extraídos depois serão de forma em que apenas um agregado é avaliado do grupo, para criarem bases práticas para intervir e solucionar questões na rotina da equipa toda.</li>
+                <li>Pedimos a sua identificação de CPF para a validação pura de segurança anti-duplicação, mas fique totalmente tranquilo(a): assim que clica em enviar, nossos robôs no código escondem os números de identificação pessoal blindando-os de forma 100% segura para que ninguém na sua empresa possa identificar quem respondeu.</li>
+                <li>As estatísticas e gráficos extraídos depois serão de forma em que apenas um agregado é avaliado do grupo, para criarem bases práticas para intervir e solucionar questões na rotina de toda a equipe.</li>
             </ul>
         </div>
     """, unsafe_allow_html=True)
@@ -2044,7 +2044,7 @@ def survey_screen():
         
         st.markdown("---")
         st.write(f"#### 2. Avaliação do Ambiente de Trabalho")
-        st.caption("Pense no seu dia a dia ao longo das últimas 4 a 6 semanas e responda de forma muito sincera ao que lhe é questionado abaixo. Como é que as coisas realmente decorrem para si?")
+        st.caption("Pense no seu dia a dia ao longo das últimas 4 a 6 semanas e responda de forma muito sincera ao que lhe é perguntado abaixo. Como é que as coisas realmente acontecem para você?")
         
         missing = False
         answers_dict = {}
@@ -2080,18 +2080,18 @@ def survey_screen():
         
         st.markdown("---")
         st.write("#### 3. Termo de Consentimento")
-        aceite_lgpd = st.checkbox("Compreendo que a minha participação é voluntária e que as minhas respostas são anónimas e estritamente confidenciais, sendo utilizadas única e exclusivamente para fins de melhoria de qualidade de ambiente de trabalho de acordo e amparado com as normas da base imposta pela Lei Geral de Proteção de Dados (LGPD).")
+        aceite_lgpd = st.checkbox("Compreendo que a minha participação é voluntária e que as minhas respostas são anônimas e estritamente confidenciais, sendo utilizadas única e exclusivamente para fins de melhoria de qualidade de ambiente de trabalho de acordo e amparado com as normas da base imposta pela Lei Geral de Proteção de Dados (LGPD).")
         
         st.markdown("<br>", unsafe_allow_html=True)
         submit_btn = st.form_submit_button("✅ Enviar Minhas Respostas", type="primary", use_container_width=True)
         
         if submit_btn:
             if not cpf_raw or len(cpf_raw) < 11: 
-                st.error("⚠️ Atenção: Por favor verifique e insira um número válido no seu documento que o avalia (apenas algarismos) para que fique assinalado no bloco de validação.")
+                st.error("⚠️ Atenção: Por favor verifique e insira um número válido no seu documento (apenas números) para que fique assinalado no bloco de validação.")
             elif not aceite_lgpd: 
-                st.error("⚠️ Aviso Opcional e Necessário: Necessita marcar a caixa aceitando os pressupostos gerais da garantia e do anonimato seguro (na proteção da lei) para conseguir ser habilitado.")
+                st.error("⚠️ Aviso Obrigatório: É necessário marcar a caixa aceitando os termos da garantia e do anonimato seguro (na proteção da lei) para conseguir enviar.")
             elif missing: 
-                st.error("⚠️ Atenção: Identificámos que ainda falta preencher opções das abas anteriores em cima. Recomendamos rever em cada um dos painéis categorizados as lacunas preenchendo todos para o botão de registo da avaliação poder ser validado a ser emitido.")
+                st.error("⚠️ Atenção: Identificamos que ainda falta preencher algumas opções nas abas acima. Recomendamos revisar cada painel e preencher as lacunas para que o envio da avaliação possa ser registrado.")
             else:
                 hashed_cpf = hashlib.sha256(cpf_raw.encode()).hexdigest()
                 cpf_already_exists = False
@@ -2109,7 +2109,7 @@ def survey_screen():
                             break
 
                 if cpf_already_exists:
-                    st.error("🚫 Bloqueio Acionado: O nosso sistema rastreou e verificou que este documento e avaliação sua foi remetida numa hora anterior na base. Visando a integridade forte dos dados, e também da empresa na análise em conformidade apenas avaliações preenchidas inteiramente uma só única vez têm alocação validada em nuvem.")
+                    st.error("🚫 Bloqueio Acionado: O nosso sistema rastreou e verificou que esta avaliação já foi enviada anteriormente para a nossa base. Visando a integridade forte dos dados, e também da empresa na análise, apenas avaliações preenchidas inteiramente uma só única vez têm alocação validada em nuvem.")
                 else:
                     now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
                     
@@ -2123,7 +2123,7 @@ def survey_screen():
                                 "created_at": now_str
                             }).execute()
                         except Exception as e: 
-                            st.error(f"Engasgo no contato e no procedimento que alojava base: {e}")
+                            st.error(f"Engasgo no contato e no procedimento que aloja a base: {e}")
                     else:
                         st.session_state.local_responses_db.append({
                             "company_id": comp['id'], 
