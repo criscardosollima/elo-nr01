@@ -340,6 +340,72 @@ def logout():
     st.session_state.admin_permission = None
     st.rerun()
 
+def get_copy_button_html(text_to_copy, button_label="📋 Copiar"):
+    """Cria um botão HTML/JS elegante e nativo para copiar texto diretamente do Streamlit"""
+    safe_text = json.dumps(text_to_copy)
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    body {{ margin: 0; padding: 0; background-color: transparent; font-family: 'Inter', sans-serif; }}
+    .btn {{
+        background-color: {COR_PRIMARIA};
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }}
+    .btn:hover {{
+        background-color: {COR_SECUNDARIA};
+        color: {COR_PRIMARIA};
+    }}
+    .btn.copied {{
+        background-color: {COR_RISCO_BAIXO};
+        color: #ffffff;
+    }}
+    </style>
+    </head>
+    <body>
+        <button id="copy-btn" class="btn" onclick='copyAction()'>
+            {button_label}
+        </button>
+        <script>
+            function copyAction() {{
+                const text = {safe_text};
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                
+                const btn = document.getElementById('copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Copiado com sucesso!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {{
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }}, 2500);
+            }}
+        </script>
+    </body>
+    </html>
+    """
+    return html
+
 def calculate_actual_scores(all_responses, companies_list, methodologies_dict):
     comp_method_map = {str(c['id']): c.get('metodologia', 'HSE-IT (35 itens)') for c in companies_list}
     
@@ -1246,7 +1312,10 @@ def admin_dashboard():
             c1, c2 = st.columns([2, 1])
             with c1:
                 st.markdown("##### Link de Acesso para os Colaboradores")
-                st.markdown(f"<div class='link-area' style='background-color: #f8f9fa; border: 1px dashed #dee2e6; padding: 15px; border-radius: 8px; font-family: monospace; color: #2c3e50; font-weight: bold; word-break: break-all;'>{link_final}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='background-color: #f8f9fa; border: 1px dashed #dee2e6; padding: 15px; border-radius: 8px; font-family: monospace; color: #2c3e50; font-weight: bold; word-break: break-all; margin-bottom: 5px;'>{link_final}</div>", unsafe_allow_html=True)
+                
+                # BOTÃO DE CÓPIA DO LINK VIA COMPONENTE HTML
+                st.components.v1.html(get_copy_button_html(link_final, "📋 Copiar Link Oficial"), height=55)
                 
                 limit = empresa.get('limit_evals', 999999)
                 usadas = empresa.get('respondidas', 0)
@@ -1270,7 +1339,7 @@ def admin_dashboard():
             st.markdown("</div>", unsafe_allow_html=True)
             
             st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
-            st.markdown("##### 💬 Sugestão de Mensagem de Convite (WhatsApp / E-mail)")
+            st.markdown("##### 💬 Mensagem de Convite Pronta (WhatsApp / E-mail)")
             texto_convite = f"""Olá, equipe da {empresa['razao']}! 👋
 
 Cuidar dos nossos resultados é muito importante, mas nada disso faz sentido se não cuidarmos, em primeiro lugar, de quem faz tudo acontecer: vocês.
@@ -1294,7 +1363,13 @@ Agradecemos imensamente o seu tempo e o seu compartilhamento. Só com a sua hone
 
 Atenciosamente,
 Equipe de Recursos Humanos e Liderança"""
-            st.text_area("Pode copiar e adaptar o modelo abaixo para enviar aos colaboradores:", value=texto_convite, height=450)
+            
+            # Caixa de edição do texto, capturando sempre a versão atual
+            texto_editado = st.text_area("Você pode editar o modelo abaixo antes de copiar e enviar aos colaboradores:", value=texto_convite, height=450)
+            
+            # BOTÃO DE CÓPIA DO TEXTO VIA COMPONENTE HTML
+            st.components.v1.html(get_copy_button_html(texto_editado, "📋 Copiar Mensagem de Convite"), height=55)
+            
             st.markdown("</div>", unsafe_allow_html=True)
 
     elif selected == "Relatórios e Laudos":
@@ -1686,7 +1761,7 @@ Equipe de Recursos Humanos e Liderança"""
                     <div style="flex: 1; text-align: center; border-top: 1px solid #2c3e50; padding-top: 12px;">
                         <div style="font-weight: 800; font-size: 12px; color: #2c3e50; text-transform: uppercase;">{sig_tecnico_nome}</div>
                         <div style="color: #7f8c8d; font-size: 10px; margin-top: 4px;">{sig_tecnico_cargo}</div>
-                        <div style="color: #95a5a6; font-size: 9px; margin-top: 2px;">Chancela Técnica Eletrônica da Avalista Pericial</div>
+                        <div style="color: #95a5a6; font-size: 9px; margin-top: 2px;">Chancela Técnica Eletrônica do Avaliador(a) Pericial</div>
                     </div>
                 </div>
                 
