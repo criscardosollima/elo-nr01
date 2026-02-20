@@ -575,110 +575,174 @@ def gerar_analise_robusta(dimensoes):
     return texto
 
 def gerar_banco_sugestoes(dimensoes):
+    """
+    O mais vasto banco de sugestões de ações táticas para RH, cruzando
+    todos os cenários de risco detectáveis tanto na metodologia HSE quanto na COPSOQ.
+    """
     sugestoes = []
     
-    # ------------------ BLOCO: DEMANDAS E CARGA ------------------
-    if dimensoes.get("Demandas", 5) < 3.8 or dimensoes.get("Exigências Laborais e Ritmo", 5) < 3.8:
+    # ------------------ BLOCO 1: EXIGÊNCIAS, CARGA E RITMO DE TRABALHO ------------------
+    if dimensoes.get("Demandas", 5) < 3.8 or dimensoes.get("Exigências Laborais (Quantidade e Ritmo)", 5) < 3.8:
         sugestoes.append({
-            "acao": "Avaliação de Carga de Trabalho", 
-            "estrat": "Analisar as rotinas das equipes para identificar sobrecargas, tarefas duplicadas e oportunidades para melhor distribuição do trabalho diário.", 
+            "acao": "Avaliação Ergonômica e Cognitiva da Carga de Trabalho", 
+            "estrat": "Analisar profundamente as rotinas para identificar sobrecargas invisíveis (trabalho cognitivo e emocional intenso), tarefas duplicadas e otimizar a distribuição do trabalho na base.", 
             "area": "Gestão de Demandas", "resp": "Coordenação de Área", "prazo": "30 a 60 dias"
         })
         sugestoes.append({
-            "acao": "Matriz de Prioridades", 
-            "estrat": "Ajudar as equipes a organizar melhor o tempo, separando o que é urgente do que é importante, evitando o desgaste de trabalhar sempre no limite.", 
+            "acao": "Matriz de Prioridades e Redução de Urgências", 
+            "estrat": "Treinar as equipes a organizar melhor o tempo e blindar os colaboradores contra a cultura da urgência, evitando o desgaste contínuo e combatendo 'incêndios diários'.", 
             "area": "Gestão de Demandas", "resp": "Líderes de Equipe", "prazo": "15 dias"
         })
         sugestoes.append({
-            "acao": "Política de Desconexão", 
-            "estrat": "Criar combinados claros com a equipe sobre o respeito aos horários de descanso, evitando e-mails e mensagens de trabalho fora do expediente.", 
+            "acao": "Política de Desconexão Digital", 
+            "estrat": "Criar combinados claros com a equipe sobre o respeito absoluto aos horários de descanso, evitando e-mails e mensagens de trabalho fora do expediente contratual.", 
             "area": "Gestão de Demandas", "resp": "Recursos Humanos", "prazo": "30 dias"
         })
-        
-    # ------------------ BLOCO: CONTROLE E AUTONOMIA ------------------
-    if dimensoes.get("Controlo", 5) < 3.8 or dimensoes.get("Organização e Influência", 5) < 3.8:
         sugestoes.append({
-            "acao": "Flexibilidade com Responsabilidade", 
-            "estrat": "Focar a avaliação no cumprimento de objetivos e entregas, em vez de se focar apenas nas horas passadas no posto de trabalho.", 
-            "area": "Autonomia e Organização", "resp": "Gestão", "prazo": "90 dias"
+            "acao": "Rodízio de Tarefas de Alto Desgaste Emocional", 
+            "estrat": "Implementar um sistema de revezamento para colaboradores que lidam constantemente com clientes difíceis ou situações de alta carga emocional, evitando a fadiga e o cinismo.", 
+            "area": "Design do Trabalho", "resp": "Coordenação Operacional", "prazo": "Contínuo"
         })
         sugestoes.append({
-            "acao": "Maior Participação nas Decisões", 
-            "estrat": "Envolver mais a equipe antes de implementar novos sistemas ou mudanças nas rotinas, ouvindo quem está no terreno executando a tarefa.", 
-            "area": "Autonomia e Organização", "resp": "Líderes de Equipe", "prazo": "Ação Contínua"
+            "acao": "Pausas Estratégicas Obrigatórias", 
+            "estrat": "Institucionalizar micropausas de descompressão cognitiva entre blocos intensos de concentração, melhorando a preservação mental da equipe (ex: Técnica Pomodoro aplicada).", 
+            "area": "Saúde Ocupacional", "resp": "SESMT / Liderança", "prazo": "Imediato"
         })
         
-    # ------------------ BLOCO: SUPORTE GESTÃO E EQUIPE ------------------
-    if dimensoes.get("Suporte do Gestor", 5) < 3.8 or dimensoes.get("Suporte dos Colegas", 5) < 3.8 or dimensoes.get("Relações e Liderança", 5) < 3.8:
+    # ------------------ BLOCO 2: AUTONOMIA, CONTROLE E INFLUÊNCIA ------------------
+    if dimensoes.get("Controle", 5) < 3.8 or dimensoes.get("Organização e Influência", 5) < 3.8:
         sugestoes.append({
-            "acao": "Desenvolvimento de Lideranças", 
-            "estrat": "Capacitar os gestores em competências de empatia, escuta ativa e comunicação construtiva, focando no desenvolvimento humano da equipe.", 
-            "area": "Suporte e Liderança", "resp": "Recursos Humanos", "prazo": "90 dias"
+            "acao": "Job Crafting (Redesenho do Trabalho)", 
+            "estrat": "Autorizar e estimular que o profissional tenha autonomia para remodelar de forma positiva a maneira como executa suas tarefas diárias, respeitando sua forma de produzir.", 
+            "area": "Autonomia e Organização", "resp": "Gestão Direta", "prazo": "90 dias"
         })
         sugestoes.append({
-            "acao": "Reuniões Individuais (1:1)", 
-            "estrat": "Implementar momentos quinzenais ou mensais de conversa individual do líder com cada colaborador, focados no bem-estar, carreira e feedback mútuo.", 
-            "area": "Suporte e Liderança", "resp": "Líderes de Área", "prazo": "Ação Contínua"
+            "acao": "Gestão Focada em Entregas (Resultados vs. Horas)", 
+            "estrat": "Migrar o foco da avaliação baseada em presencialismo (horas em tela) para a qualidade das entregas, fomentando maior responsabilidade e flexibilidade de tempo.", 
+            "area": "Autonomia e Organização", "resp": "Diretoria e Lideranças", "prazo": "Trimestral"
         })
         sugestoes.append({
-            "acao": "Cultura de Reconhecimento", 
-            "estrat": "Celebrar abertamente as pequenas e grandes vitórias da equipe, criando o hábito do elogio sincero pelo bom trabalho realizado.", 
-            "area": "Suporte e Liderança", "resp": "Direção e Gestão", "prazo": "Ação Contínua"
-        })
-        
-    # ------------------ BLOCO: RELACIONAMENTOS E CULTURA ------------------
-    if dimensoes.get("Relacionamentos", 5) < 3.8 or dimensoes.get("Ambiente Ofensivo (Últimos 12 meses)", 5) < 3.8:
-        sugestoes.append({
-            "acao": "Reforço da Política de Respeito", 
-            "estrat": "Garantir a tolerância zero contra qualquer tipo de assédio, comentários ofensivos ou comportamentos que prejudiquem o bom ambiente.", 
-            "area": "Clima e Relações", "resp": "Recursos Humanos", "prazo": "Imediato"
+            "acao": "Comitês de Escuta Ativa para Decisões", 
+            "estrat": "Envolver os profissionais da base em pequenas rodadas de escuta ANTES de tomar decisões top-down sobre softwares, rotinas ou mudanças no ambiente físico.", 
+            "area": "Autonomia e Organização", "resp": "Líderes de Setor", "prazo": "Ad Hoc"
         })
         sugestoes.append({
-            "acao": "Canal de Escuta Segura", 
-            "estrat": "Disponibilizar um canal seguro e confidencial para que as pessoas possam relatar problemas graves de convivência sem receio de represálias.", 
-            "area": "Clima e Relações", "resp": "Recursos Humanos", "prazo": "60 dias"
+            "acao": "Programa de Aproveitamento de Talentos", 
+            "estrat": "Mapear habilidades subutilizadas na equipe e criar projetos especiais onde o colaborador possa usar todo seu potencial criativo e técnico.", 
+            "area": "Desenvolvimento", "resp": "T&D (Treinamento)", "prazo": "Plano Anual"
         })
         
-    # ------------------ BLOCO: PAPEL FUNCIONAL E VALORES ------------------
-    if dimensoes.get("Papel na Empresa", 5) < 3.8 or dimensoes.get("Valores, Justiça e Confiança", 5) < 3.8:
+    # ------------------ BLOCO 3: SUPORTE, LIDERANÇA E RELAÇÕES SOCIAIS ------------------
+    if dimensoes.get("Suporte do Gestor", 5) < 3.8 or dimensoes.get("Suporte dos Colegas", 5) < 3.8 or dimensoes.get("Relações Sociais e Liderança", 5) < 3.8:
         sugestoes.append({
-            "acao": "Clareza de Funções e Expectativas", 
-            "estrat": "Rever a descrição das funções junto aos colaboradores para garantir que todos sabem exatamente o que se espera do seu trabalho.", 
-            "area": "Sentido e Propósito", "resp": "Recursos Humanos", "prazo": "90 dias"
+            "acao": "Letramento em Liderança Empática e Sensível", 
+            "estrat": "Treinar intensivamente toda a camada de gestão em Inteligência Emocional, Comunicação Não-Violenta (CNV) e condução de equipes com segurança psicológica.", 
+            "area": "Liderança", "resp": "Pessin Gestão / RH", "prazo": "90 dias"
         })
         sugestoes.append({
-            "acao": "Compartilhamento de Propósito", 
-            "estrat": "Comunicar com transparência como o esforço diário de cada pessoa ajuda a empresa a atingir os seus grandes objetivos.", 
-            "area": "Sentido e Propósito", "resp": "Direção Executiva", "prazo": "Trimestral"
+            "acao": "Reuniões de Check-in (1:1) Focadas no Humano", 
+            "estrat": "Implementar agendas inegociáveis de 1:1 focadas não nas metas da semana, mas em ouvir as dores, a carreira e o bem-estar genuíno do colaborador.", 
+            "area": "Liderança", "resp": "Gestão Direta", "prazo": "Ação Contínua"
         })
-        
-    # ------------------ BLOCO: GESTÃO DE MUDANÇA ------------------
-    if dimensoes.get("Gestão de Mudança", 5) < 3.8:
         sugestoes.append({
-            "acao": "Comunicação Transparente de Mudanças", 
-            "estrat": "Antes de qualquer alteração importante na empresa, explicar de forma clara o 'porquê' da mudança e como ela vai impactar a rotina das pessoas.", 
-            "area": "Comunicação e Transição", "resp": "Comunicação Interna", "prazo": "Por Projeto"
+            "acao": "Cultura Constante de Reconhecimento Positivo", 
+            "estrat": "Criar um fórum de elogios abertos ou plataformas onde líderes e colegas valorizam publicamente pequenas vitórias, destruindo a cultura de 'apontar só os erros'.", 
+            "area": "Clima", "resp": "Recursos Humanos", "prazo": "Imediato"
+        })
+        sugestoes.append({
+            "acao": "Programa de Mentoria Institucional (Buddy)", 
+            "estrat": "Designar 'padrinhos' veteranos e acolhedores para acompanhar de perto cada novo colaborador nos primeiros 90 dias, reduzindo a sensação de solidão organizacional.", 
+            "area": "Clima e Acolhimento", "resp": "Recursos Humanos", "prazo": "30 dias"
+        })
+        sugestoes.append({
+            "acao": "Dinâmicas de Fortalecimento de Equipe (Team Building)", 
+            "estrat": "Investir em rituais leves e de descompressão fora do ambiente estrito de trabalho para fortalecer os laços de comunidade, pertencimento e confiança interpessoal.", 
+            "area": "Clima", "resp": "Comunicação Interna", "prazo": "Semestral"
         })
 
-    # ------------------ BLOCO: SAÚDE E BEM-ESTAR (COPSOQ) ------------------
-    if dimensoes.get("Interface Trabalho-Família e Saúde", 5) < 3.8:
+    # ------------------ BLOCO 4: AMBIENTE, RESPEITO E GESTÃO DE CONFLITOS ------------------
+    if dimensoes.get("Relacionamentos", 5) < 3.8 or dimensoes.get("Ambiente Ofensivo (Últimos 12 meses)", 5) < 3.8 or dimensoes.get("Transparência de Papel e Conflitos", 5) < 3.8:
         sugestoes.append({
-            "acao": "Programa de Cuidado e Bem-Estar", 
-            "estrat": "Oferecer apoio psicológico, parcerias de saúde mental e promover a importância do equilíbrio entre a vida pessoal e o trabalho.", 
-            "area": "Saúde Ocupacional", "resp": "Recursos Humanos / Saúde", "prazo": "Ação Contínua"
+            "acao": "Política de Tolerância Zero (Assédio e Discriminação)", 
+            "estrat": "Oficializar e divulgar agressivamente um código de conduta inquebrável contra bullying, assédio moral, exclusões ou palavras ofensivas, com consequências rígidas.", 
+            "area": "Compliance e Clima", "resp": "Diretoria e Jurídico", "prazo": "Imediato"
+        })
+        sugestoes.append({
+            "acao": "Canal de Ouvidoria Anônimo e Independente", 
+            "estrat": "Contratar ou disponibilizar uma plataforma terceira 100% blindada para o reporte seguro de assédio ou liderança abusiva, garantindo total ausência de retaliação.", 
+            "area": "Compliance", "resp": "RH Estratégico", "prazo": "60 dias"
+        })
+        sugestoes.append({
+            "acao": "Mediação Profissional de Conflitos Internos", 
+            "estrat": "Frente à identificação de setores 'tóxicos', intervir cirurgicamente com especialistas em mediação de conflito para desfazer panelinhas e resolver quebras de relação.", 
+            "area": "Clima", "resp": "Pessin Gestão / RH", "prazo": "Sob Demanda"
         })
         
-    # ------------------ FALLBACK (BOM CENÁRIO GERAL) ------------------
-    if not sugestoes:
+    # ------------------ BLOCO 5: PROPÓSITO, VALORES, JUSTIÇA E SATISFAÇÃO ------------------
+    if dimensoes.get("Papel na Empresa", 5) < 3.8 or dimensoes.get("Valores, Justiça e Confiança", 5) < 3.8 or dimensoes.get("Atitude e Satisfação", 5) < 3.8:
         sugestoes.append({
-            "acao": "Monitoramento Contínuo de Clima", 
-            "estrat": "Manter a realização periódica de conversas e questionários rápidos para garantir que o bom ambiente de trabalho atual se sustenta no futuro.", 
-            "area": "Estratégia Geral de RH", "resp": "Recursos Humanos", "prazo": "Ação Contínua"
+            "acao": "Alinhamento Claro de Funções (Job Description Vivo)", 
+            "estrat": "Acabar com as zonas cinzentas de responsabilidade. Documentar e assinar junto com o time o que exatamente é (e o que não é) tarefa daquela posição.", 
+            "area": "Organização", "resp": "Gestores de Área", "prazo": "60 dias"
         })
         sugestoes.append({
-            "acao": "Incentivo à Qualidade de Vida", 
-            "estrat": "Promover iniciativas leves no escritório e benefícios focados na qualidade de vida e saúde mental preventiva das equipes.", 
-            "area": "Estratégia Geral de RH", "resp": "Recursos Humanos", "prazo": "Plano Anual"
+            "acao": "Cascateamento de Propósito e Visão", 
+            "estrat": "Liderança de topo deve descer à operação para mostrar, com exemplos claros, como o aperto de um parafuso ou o envio de um e-mail base impacta a vida do cliente final.", 
+            "area": "Sentido do Trabalho", "resp": "Direção Executiva", "prazo": "Trimestral"
+        })
+        sugestoes.append({
+            "acao": "Transparência em Critérios de Promoção e Mérito", 
+            "estrat": "Aumentar a justiça organizacional divulgando abertamente o que é necessário realizar (PDI, metas) para ascender na empresa, evitando promoções percebidas como favoritismo.", 
+            "area": "Justiça e Cultura", "resp": "Recursos Humanos", "prazo": "Plano Anual"
+        })
+        sugestoes.append({
+            "acao": "Fórum de Transparência da Diretoria", 
+            "estrat": "Criar um espaço (Town Hall) onde a gerência abre o jogo sobre as dificuldades, rumos e sucessos da empresa, reduzindo a sensação de que 'escondem informações'.", 
+            "area": "Confiança", "resp": "Diretoria", "prazo": "Semestral"
+        })
+        
+    # ------------------ BLOCO 6: GESTÃO E TRANSIÇÃO DE MUDANÇAS ------------------
+    if dimensoes.get("Gestão de Mudança", 5) < 3.8:
+        sugestoes.append({
+            "acao": "Comunicação Antecipada e Transparente", 
+            "estrat": "Nunca surpreender o time com mudanças que afetam sua rotina. Explicar sempre o 'porquê' da alteração com semanas de antecedência, mitigando a ansiedade natural.", 
+            "area": "Gestão de Mudança", "resp": "Comunicação Interna", "prazo": "Por Projeto"
+        })
+        sugestoes.append({
+            "acao": "Comitê de Embaixadores da Mudança", 
+            "estrat": "Identificar formadores de opinião na operação para testarem novos sistemas primeiro e atuarem como multiplicadores de segurança para os colegas mais resistentes.", 
+            "area": "Gestão de Mudança", "resp": "Líder de Projetos", "prazo": "Por Projeto"
+        })
+
+    # ------------------ BLOCO 7: SAÚDE, BEM-ESTAR, SONO E FAMÍLIA (EXCLUSIVO COPSOQ) ------------------
+    if dimensoes.get("Saúde, Bem-estar e Rotina", 5) < 3.8:
+        sugestoes.append({
+            "acao": "Programa Estruturado de Apoio Psicológico", 
+            "estrat": "Firmar parcerias com plataformas terapêuticas subsidiando sessões de psicoterapia, com foco urgente no combate aos altos índices de ansiedade e exaustão emocional.", 
+            "area": "Saúde Mental", "resp": "Benefícios / SESMT", "prazo": "Ação Imediata"
+        })
+        sugestoes.append({
+            "acao": "Workshops de Higiene do Sono e Prevenção ao Burnout", 
+            "estrat": "Trazer profissionais de saúde para ensinar o colaborador a 'desligar' o cérebro à noite e reconhecer em si e nos colegas os sinais precoces da estafa.", 
+            "area": "Saúde Ocupacional", "resp": "T&D e SESMT", "prazo": "Trimestral"
+        })
+        sugestoes.append({
+            "acao": "Políticas Reais de Flexibilidade Familiar", 
+            "estrat": "Apoiar mães/pais na conciliação familiar com horários híbridos reais, auxílio-creche estruturado e respeito a emergências familiares, reduzindo a culpa do trabalhador.", 
+            "area": "Bem-estar (Work-life)", "resp": "RH Institucional", "prazo": "Revisão Anual"
+        })
+        
+    # ------------------ FALLBACK (CENÁRIO EXCELENTE) ------------------
+    if not sugestoes:
+        sugestoes.append({
+            "acao": "Monitoramento Contínuo com Pesquisas de Pulso", 
+            "estrat": "Não relaxar o acompanhamento. Manter questionários semanais de 3 perguntas na intranet para identificar qualquer micro-fissura no clima rapidamente.", 
+            "area": "Estratégia Geral", "resp": "Recursos Humanos", "prazo": "Contínuo"
+        })
+        sugestoes.append({
+            "acao": "Pacote Avançado de Qualidade de Vida", 
+            "estrat": "Sustentar a boa saúde mental com iniciativas premium: Gympass ativo, massagem rápida, snacks saudáveis, palestras de educação financeira e bem-estar geral.", 
+            "area": "Estratégia Geral", "resp": "Recursos Humanos", "prazo": "Contínuo"
         })
         
     return sugestoes
