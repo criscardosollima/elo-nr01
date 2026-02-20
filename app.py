@@ -1686,7 +1686,7 @@ Equipe de Recursos Humanos e Liderança"""
                     <div style="flex: 1; text-align: center; border-top: 1px solid #2c3e50; padding-top: 12px;">
                         <div style="font-weight: 800; font-size: 12px; color: #2c3e50; text-transform: uppercase;">{sig_tecnico_nome}</div>
                         <div style="color: #7f8c8d; font-size: 10px; margin-top: 4px;">{sig_tecnico_cargo}</div>
-                        <div style="color: #95a5a6; font-size: 9px; margin-top: 2px;">Chancela Técnica Eletrônica do Avaliador(a) Pericial</div>
+                        <div style="color: #95a5a6; font-size: 9px; margin-top: 2px;">Chancela Técnica Eletrônica da Avalista Pericial</div>
                     </div>
                 </div>
                 
@@ -2062,20 +2062,43 @@ def survey_screen():
     cod = st.query_params.get("cod")
     
     comp = None
-    if DB_CONNECTED:
-        try:
-            res = supabase.table('companies').select("*").eq('id', cod).execute()
-            if res.data: comp = res.data[0]
-        except: pass
-        
-    if not comp: 
-        comp = next((c for c in st.session_state.companies_db if c['id'] == cod), None)
     
+    # 1. VERIFICAÇÃO MODO PREVIEW (RH VISUALIZANDO)
+    if not cod and st.session_state.get('user_role') == 'colaborador' and st.session_state.get('current_company'):
+        comp = st.session_state.current_company
+    else:
+        # 2. ACESSO REAL (VIA LINK DO COLABORADOR)
+        if DB_CONNECTED and cod:
+            try:
+                res = supabase.table('companies').select("*").eq('id', cod).execute()
+                if res.data: comp = res.data[0]
+            except: pass
+            
+        if not comp and cod: 
+            comp = next((c for c in st.session_state.companies_db if str(c['id']) == str(cod)), None)
+    
+    # 3. TRATATIVA DE ERRO DE LINK INVÁLIDO
     if not comp: 
         st.error("❌ Código de Rastreio Inválido. Pedimos que tente acessar novamente e confirme junto ao líder de Recursos Humanos se o seu link foi bem encaminhado e enviado sem erro de digitação.")
+        # Fallback para o RH voltar caso se perca
+        if st.session_state.get('admin_permission'):
+            if st.button("⬅️ Voltar ao Painel Administrativo"):
+                st.session_state.user_role = 'admin'
+                st.rerun()
         return
+        
+    # 4. BOTÃO DE VOLTAR EXCLUSIVO PARA O MODO PREVIEW DO RH
+    is_preview = st.session_state.get('admin_permission') is not None and st.session_state.get('user_role') == 'colaborador'
+    if is_preview:
+        st.info("👁️ **Modo Visualização Ativo:** Você está vendo esta tela exatamente como o colaborador a verá. Enviar respostas aqui afetará os gráficos da empresa.")
+        if st.button("⬅️ Sair da Visualização e Voltar ao Painel", type="secondary"):
+            st.session_state.user_role = 'admin'
+            st.session_state.current_company = None
+            st.rerun()
+        st.markdown("---")
 
-    if comp.get('valid_until'):
+    # 5. VALIDAÇÃO DE DATA E COTA (Pula os bloqueios se for o RH visualizando)
+    if comp.get('valid_until') and not is_preview:
         try:
             if datetime.date.today() > datetime.date.fromisoformat(comp['valid_until']):
                 st.error("⛔ O link fornecido para a sua empresa já se encontra inativo ou expirado.")
@@ -2084,16 +2107,16 @@ def survey_screen():
         
     limit_evals = comp.get('limit_evals', 999999)
     resp_count = comp.get('respondidas', 0) if comp.get('respondidas') is not None else 0
-    if resp_count >= limit_evals:
+    if resp_count >= limit_evals and not is_preview:
         st.error("⚠️ Pedimos desculpas. Infelizmente já foi atingido o número limite de respostas para este projeto em particular. Obrigado pela boa vontade em compartilhar e apoiar.")
         return
     
-    # 1. Recupera Metodologia
+    # Resgata a metodologia amarrada a empresa
     metodo_nome = comp.get('metodologia', 'HSE-IT (35 itens)')
     metodo_dados = st.session_state.methodologies.get(metodo_nome, st.session_state.methodologies['HSE-IT (35 itens)'])
     perguntas = metodo_dados['questions']
 
-    # 2. Descobre se a empresa exige CPF (Lendo de dentro do JSONB org_structure)
+    # Descobre se a empresa exige CPF (Lendo de dentro do JSONB org_structure)
     org_struct = comp.get('org_structure', {})
     exige_cpf = org_struct.get('_exigir_cpf', True) if isinstance(org_struct, dict) else True
 
@@ -2240,7 +2263,13 @@ def survey_screen():
                     st.balloons()
                     time.sleep(4.5)
                     
-                    st.session_state.logged_in = False 
+                    # Se for o RH em modo Preview, volta pro admin ao invés de deslogar
+                    if is_preview:
+                        st.session_state.user_role = 'admin'
+                        st.session_state.current_company = None
+                    else:
+                        st.session_state.logged_in = False 
+                        
                     st.rerun()
 
 # ==============================================================================
