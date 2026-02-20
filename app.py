@@ -942,6 +942,10 @@ def admin_dashboard():
         total_resp_view = len(responses_filtered)
         total_vidas_view = sum(c.get('func', 0) for c in companies_filtered)
         
+        # --- Lógica de Alerta de Risco (Empresas na Zona Vermelha) ---
+        # Considera em risco apenas empresas que já têm respostas (score > 0) e pontuação menor que 3.0
+        alertas_risco = sum(1 for c in companies_filtered if 0 < c.get('score', 0) < 3.0)
+        
         col1, col2, col3, col4 = st.columns(4)
         if perm == "Analista":
             with col1: kpi_card("Total de Colaboradores", total_vidas_view, "👥", "bg-blue")
@@ -955,7 +959,7 @@ def admin_dashboard():
             else: 
                 with col3: kpi_card("Avaliações Disponíveis", credits_left, "💳", "bg-orange")
 
-        with col4: kpi_card("Alertas de Risco", 0, "🚨", "bg-red")
+        with col4: kpi_card("Alertas de Risco", alertas_risco, "🚨", "bg-red")
         
         st.markdown("<br>", unsafe_allow_html=True)
         c1, c2 = st.columns([1, 1.5])
