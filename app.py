@@ -575,10 +575,6 @@ def gerar_analise_robusta(dimensoes):
     return texto
 
 def gerar_banco_sugestoes(dimensoes):
-    """
-    O mais vasto banco de sugestões de ações táticas para RH, cruzando
-    todos os cenários de risco detectáveis tanto na metodologia HSE quanto na COPSOQ.
-    """
     sugestoes = []
     
     # ------------------ BLOCO 1: EXIGÊNCIAS, CARGA E RITMO DE TRABALHO ------------------
@@ -1009,12 +1005,22 @@ def admin_dashboard():
                         except: pass
                     new_valid = st.date_input("Validade do Link de Pesquisa:", value=val_atual)
                     
+                    # Carrega a configuração atual de CPF da empresa (se houver, senao True)
+                    current_cpf_req = emp_edit.get('org_structure', {}).get('_exigir_cpf', True) if isinstance(emp_edit.get('org_structure'), dict) else True
+                    new_exigir_cpf = st.checkbox("🔒 Exigir CPF para evitar respostas duplicadas (Recomendado)", value=current_cpf_req)
+                    
                     if st.form_submit_button("💾 Guardar Alterações", type="primary"):
+                        updated_org = emp_edit.get('org_structure', {})
+                        if not isinstance(updated_org, dict):
+                            updated_org = {"Geral": ["Geral"]}
+                        updated_org['_exigir_cpf'] = new_exigir_cpf
+                        
                         update_dict = {
                             'razao': new_razao, 'cnpj': new_cnpj, 'cnae': new_cnae, 
                             'risco': new_risco, 'func': new_func, 'segmentacao': new_seg, 
                             'resp': new_resp, 'email': new_email, 'telefone': new_tel, 
-                            'endereco': new_end, 'limit_evals': new_limit, 'valid_until': new_valid.isoformat()
+                            'endereco': new_end, 'limit_evals': new_limit, 'valid_until': new_valid.isoformat(),
+                            'org_structure': updated_org
                         }
                         
                         if DB_CONNECTED:
@@ -1094,6 +1100,10 @@ def admin_dashboard():
                         logo_cliente = st.file_uploader("Logotipo do Cliente (Opcional - Formatos PNG ou JPG)", type=['png', 'jpg', 'jpeg'])
                         
                         st.markdown("---")
+                        st.write("### Privacidade da Pesquisa")
+                        exigir_cpf = st.checkbox("🔒 Exigir CPF do colaborador para evitar respostas duplicadas (O dado será criptografado no banco para garantir o anonimato)", value=True)
+                        
+                        st.markdown("---")
                         st.write("### Acesso Exclusivo para o Cliente (Portal do Analista)")
                         st.caption("Crie aqui um acesso para que a equipe de RH do cliente possa visualizar os seus próprios resultados e dashboards.")
                         u_login = st.text_input("Usuário de Acesso")
@@ -1105,6 +1115,8 @@ def admin_dashboard():
                             else:
                                 cod = str(uuid.uuid4())[:8].upper()
                                 logo_str = image_to_base64(logo_cliente)
+                                
+                                org_structure_dict = {"Geral": ["Geral"], "_exigir_cpf": exigir_cpf}
                                 
                                 new_c = {
                                     "id": cod, 
@@ -1128,7 +1140,7 @@ def admin_dashboard():
                                     "owner": curr_user, 
                                     "dimensoes": {}, 
                                     "detalhe_perguntas": {}, 
-                                    "org_structure": {"Geral": ["Geral"]}
+                                    "org_structure": org_structure_dict
                                 }
                                 
                                 error_msg = None
@@ -1168,8 +1180,11 @@ def admin_dashboard():
         empresa = next((c for c in visible_companies if c['razao'] == empresa_nome), None)
         
         if empresa is not None:
-            if 'org_structure' not in empresa or not empresa['org_structure']: 
+            if 'org_structure' not in empresa or not isinstance(empresa['org_structure'], dict): 
                 empresa['org_structure'] = {"Geral": ["Geral"]}
+            
+            # Filtra chaves de configuração invisíveis do layout
+            setores_existentes = [k for k in empresa['org_structure'].keys() if not k.startswith('_')]
             
             c1, c2 = st.columns(2)
             with c1:
@@ -1187,7 +1202,6 @@ def admin_dashboard():
                         time.sleep(1); st.rerun()
                 
                 st.markdown("---")
-                setores_existentes = list(empresa['org_structure'].keys())
                 setor_remover = st.selectbox("Selecione o setor para remover", setores_existentes)
                 if st.button("🗑️ Remover Setor"):
                     del empresa['org_structure'][setor_remover]
@@ -2074,9 +2088,14 @@ def survey_screen():
         st.error("⚠️ Pedimos desculpas. Infelizmente já foi atingido o número limite de respostas para este projeto em particular. Obrigado pela boa vontade em compartilhar e apoiar.")
         return
     
+    # 1. Recupera Metodologia
     metodo_nome = comp.get('metodologia', 'HSE-IT (35 itens)')
     metodo_dados = st.session_state.methodologies.get(metodo_nome, st.session_state.methodologies['HSE-IT (35 itens)'])
     perguntas = metodo_dados['questions']
+
+    # 2. Descobre se a empresa exige CPF (Lendo de dentro do JSONB org_structure)
+    org_struct = comp.get('org_structure', {})
+    exige_cpf = org_struct.get('_exigir_cpf', True) if isinstance(org_struct, dict) else True
 
     logo = get_logo_html(150)
     if comp.get('logo_b64'): logo = f"<img src='data:image/png;base64,{comp.get('logo_b64')}' width='180'>"
@@ -2084,27 +2103,39 @@ def survey_screen():
     st.markdown(f"<div style='text-align:center; margin-bottom: 20px;'>{logo}</div>", unsafe_allow_html=True)
     st.markdown(f"<h3 style='text-align:center; color: {COR_PRIMARIA}; font-weight:800; font-family:sans-serif; text-transform:uppercase;'>Pesquisa de Clima e Riscos Psicossociais - {comp['razao']}</h3>", unsafe_allow_html=True)
     
-    st.markdown("""
+    # Ajuste dinâmico do texto do alerta baseado na exigência de CPF
+    if exige_cpf:
+        texto_alerta_cpf = "<li>Pedimos a sua identificação de CPF apenas como chave de segurança anti-duplicação, mas fique totalmente tranquilo(a): assim que você clica em enviar, o sistema transforma seu número em um código criptografado, garantindo 100% de anonimato. A empresa nunca saberá quem respondeu o quê.</li>"
+    else:
+        texto_alerta_cpf = "<li>Sua empresa optou por uma pesquisa <strong>100% livre de identificação prévia</strong>. O preenchimento do CPF foi desativado para garantir a você máximo conforto e anonimato absoluto desde o início.</li>"
+
+    st.markdown(f"""
         <div class='security-alert'>
             <strong>🔒 A SUA PRIVACIDADE É A NOSSA PRIORIDADE</strong><br>
             Sua chefia direta, colegas ou liderança <strong>não terão acesso</strong> a ler o que você escreve individualmente e assinala agora nesta tela.<br>
             <ul>
-                <li>Pedimos a sua identificação de CPF para a validação pura de segurança anti-duplicação, mas fique totalmente tranquilo(a): assim que clica em enviar, nossos robôs no código escondem os números de identificação pessoal blindando-os de forma 100% segura para que ninguém na sua empresa possa identificar quem respondeu.</li>
-                <li>As estatísticas e gráficos extraídos depois serão de forma em que apenas um agregado é avaliado do grupo, para criarem bases práticas para intervir e solucionar questões na rotina de toda a equipe.</li>
+                {texto_alerta_cpf}
+                <li>As estatísticas e gráficos gerados depois serão apenas do grupo como um todo, criando bases práticas para o RH intervir e solucionar questões que afetam toda a equipe.</li>
             </ul>
         </div>
     """, unsafe_allow_html=True)
     
     with st.form("survey_form"):
-        st.write("#### 1. Seus Dados (Apenas para Validação)")
+        st.write("#### 1. Seus Dados de Perfil")
         c1, c2 = st.columns(2)
-        cpf_raw = c1.text_input("CPF (Apenas números)")
+        
+        # Renderiza (ou oculta a necessidade) do CPF de forma dinâmica
+        if exige_cpf:
+            cpf_raw = c1.text_input("CPF (Apenas números, para validação de segurança)")
+        else:
+            cpf_raw = "N/A"
+            c1.info("🟢 A identificação por CPF foi desativada pela sua empresa para esta pesquisa. Siga direto para a escolha do setor.")
         
         s_keys = ["Geral"] 
         if 'org_structure' in comp and isinstance(comp['org_structure'], dict) and comp['org_structure']:
-            s_keys = list(comp['org_structure'].keys())
+            s_keys = [k for k in comp['org_structure'].keys() if not k.startswith('_')]
              
-        setor_colab = c2.selectbox("Selecione o seu setor", s_keys)
+        setor_colab = c2.selectbox("Selecione o seu setor de atuação atual", s_keys)
         
         st.markdown("---")
         st.write(f"#### 2. Avaliação do Ambiente de Trabalho")
@@ -2150,30 +2181,38 @@ def survey_screen():
         submit_btn = st.form_submit_button("✅ Enviar Minhas Respostas", type="primary", use_container_width=True)
         
         if submit_btn:
-            if not cpf_raw or len(cpf_raw) < 11: 
-                st.error("⚠️ Atenção: Por favor verifique e insira um número válido no seu documento (apenas números) para que fique assinalado no bloco de validação.")
+            if exige_cpf and (not cpf_raw or len(cpf_raw) < 11 or cpf_raw == "N/A"): 
+                st.error("⚠️ Atenção: Por favor verifique e insira o seu documento CPF completo (apenas números) para que o envio seja validado e liberado.")
             elif not aceite_lgpd: 
                 st.error("⚠️ Aviso Obrigatório: É necessário marcar a caixa aceitando os termos da garantia e do anonimato seguro (na proteção da lei) para conseguir enviar.")
             elif missing: 
                 st.error("⚠️ Atenção: Identificamos que ainda falta preencher algumas opções nas abas acima. Recomendamos revisar cada painel e preencher as lacunas para que o envio da avaliação possa ser registrado.")
             else:
-                hashed_cpf = hashlib.sha256(cpf_raw.encode()).hexdigest()
-                cpf_already_exists = False
                 
-                if DB_CONNECTED:
-                    try:
-                        check_cpf = supabase.table('responses').select("id").eq("company_id", comp['id']).eq("cpf_hash", hashed_cpf).execute()
-                        if len(check_cpf.data) > 0: 
-                            cpf_already_exists = True
-                    except: pass
+                # Se exige CPF, processa o Hash para buscar duplicidade. Senão, cria uma tag aleatória.
+                if exige_cpf:
+                    hashed_cpf = hashlib.sha256(cpf_raw.encode()).hexdigest()
+                    cpf_already_exists = False
+                    
+                    # Checa duplicidade
+                    if DB_CONNECTED:
+                        try:
+                            check_cpf = supabase.table('responses').select("id").eq("company_id", comp['id']).eq("cpf_hash", hashed_cpf).execute()
+                            if len(check_cpf.data) > 0: 
+                                cpf_already_exists = True
+                        except: pass
+                    else:
+                        for r in st.session_state.local_responses_db:
+                            if r['company_id'] == comp['id'] and r['cpf_hash'] == hashed_cpf:
+                                cpf_already_exists = True
+                                break
                 else:
-                    for r in st.session_state.local_responses_db:
-                        if r['company_id'] == comp['id'] and r['cpf_hash'] == hashed_cpf:
-                            cpf_already_exists = True
-                            break
+                    # Modo livre de CPF: Força sempre passar sem checar duplicidade
+                    hashed_cpf = f"anon_livre_{uuid.uuid4().hex}"
+                    cpf_already_exists = False
 
                 if cpf_already_exists:
-                    st.error("🚫 Bloqueio Acionado: O nosso sistema rastreou e verificou que esta avaliação já foi enviada anteriormente para a nossa base. Visando a integridade forte dos dados, e também da empresa na análise, apenas avaliações preenchidas inteiramente uma só única vez têm alocação validada em nuvem.")
+                    st.error("🚫 O protocolo de trava antifraude acabou de interceptar o seu envio. Verificamos que o seu código CPF já foi registrado com sucesso nesta avaliação anteriormente. Visando a integridade estatística, a empresa permite apenas uma avaliação por colaborador.")
                 else:
                     now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
                     
